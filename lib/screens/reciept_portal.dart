@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, avoid_single_cascade_in_expression_statements, unrelated_type_equality_checks
+
 import 'package:cybrix/data/customed_details.dart';
 import 'package:cybrix/data/getCustomerDetails.dart';
 import 'package:cybrix/data/getVouchers.dart';
@@ -14,6 +16,7 @@ import 'package:textfield_search/textfield_search.dart';
 import 'dart:async';
 
 class RecieptPortal extends StatefulWidget {
+  const RecieptPortal({Key key}) : super(key: key);
 
   @override
   SettlementPageState2 createState() => SettlementPageState2();
@@ -28,9 +31,9 @@ class SettlementPageState2 extends State<RecieptPortal> {
   var subTotal = TextEditingController();
   double finalBalance = 0;
   DatabaseReference reference;
-  var textEditingController= TextEditingController();
+  var textEditingController = TextEditingController();
   String label = "Enter Customer Name";
-  double totalRecieved=0;
+  double totalRecieved = 0;
   String customerId;
   String from = DateTime.now().year.toString() +
       "-" +
@@ -38,57 +41,61 @@ class SettlementPageState2 extends State<RecieptPortal> {
       "-" +
       DateTime.now().day.toString();
 
-  static const duration = const Duration(seconds: 1);
+  static const duration = Duration(seconds: 1);
   Timer timer;
 
   payOn(String a) {
     setState(() {
-      finalBalance = double.parse(oldBalance.text) + double.parse(billAmount.text);
-      totalRecieved=(double.parse(paidCard.text) + double.parse(paidCash.text));
-      finalBalance = finalBalance - (double.parse(paidCard.text) + double.parse(paidCash.text));
+      finalBalance =
+          double.parse(oldBalance.text) + double.parse(billAmount.text);
+      totalRecieved =
+          (double.parse(paidCard.text) + double.parse(paidCash.text));
+      finalBalance = finalBalance -
+          (double.parse(paidCard.text) + double.parse(paidCash.text));
     });
   }
 
   addValues() async {
-    double ch=double.parse(paidCash.text);
-    double cr=double.parse(paidCard.text);
+    double ch = double.parse(paidCash.text);
+    double cr = double.parse(paidCard.text);
 
     if (await DataConnectionChecker().hasConnection) {
       Map<String, String> values = {
-        'Balance': finalBalance.toStringAsFixed(User.decimals),
-        'CustomerName':textEditingController.text,
+        'Balance': finalBalance.toStringAsFixed(2),
+        'CustomerName': textEditingController.text,
         'CustomerID': customerId,
-        'CardReceived': cr.toStringAsFixed(User.decimals),
-        'CashReceived': ch.toStringAsFixed(User.decimals),
+        'CardReceived': cr.toStringAsFixed(2),
+        'CashReceived': ch.toStringAsFixed(2),
         'ReceiptID': voucherNo.text,
         'TotalReceived': totalRecieved.toString(),
         'UpdatedTime': DateTime.now().toString(),
       };
 
-      reference.child("ReceiptPortal")
+      reference
+          .child("ReceiptPortal")
           .child(from)
           .child(User.vanNo)
-          .child(voucherNo.text).set(values);
-
+          .child(voucherNo.text)
+          .set(values);
 
       ///updating the voucher number
-      String lastVoucher = voucherNo.text.replaceAll(User.cashReceiptStarting, "");
+      String lastVoucher =
+          voucherNo.text.replaceAll(User.cashReceiptStarting, "");
       reference
         ..child("Vouchers")
             .child(User.vanNo)
             .child("CashReceiptVoucher")
             .remove()
             .whenComplete(() => {
-          reference
-            ..child("Vouchers")
-                .child(User.vanNo)
-                .child("CashReceiptVoucher")
-                .set(lastVoucher.toString())
-        });
+                  reference
+                    ..child("Vouchers")
+                        .child(User.vanNo)
+                        .child("CashReceiptVoucher")
+                        .set(lastVoucher.toString())
+                });
 
       final prefs = await SharedPreferences.getInstance();
-      prefs.setInt("cashnumber",int.parse(lastVoucher));
-
+      prefs.setInt("cashnumber", int.parse(lastVoucher));
 
       FlutterFlexibleToast.showToast(
           message: "Added to Receipt Portal",
@@ -110,7 +117,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
           back: false,
         );
       }));
-    }else{
+    } else {
       FlutterFlexibleToast.showToast(
           message: "No Internet",
           toastGravity: ToastGravity.BOTTOM,
@@ -122,9 +129,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
           backgroundColor: Colors.black,
           timeInSeconds: 2);
     }
-
   }
-
 
   Future<void> getBalance() async {
     // GetCustomerDetails().getCustomerId(textEditingController.text).whenComplete(() => {
@@ -136,30 +141,28 @@ class SettlementPageState2 extends State<RecieptPortal> {
     await reference.child("Customers").once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key, values) {
-        if ( values['Name'].toString() == textEditingController.text) {
+        if (values['Name'].toString() == textEditingController.text) {
           setState(() {
             oldBalance.text = values["Balance"].toString();
-            customerId= values["CustomerID"].toString();
+            customerId = values["CustomerID"].toString();
           });
-        }
-        else if(values['CustomerCode'].toString() == textEditingController.text){
+        } else if (values['CustomerCode'].toString() ==
+            textEditingController.text) {
           setState(() {
             oldBalance.text = values["Balance"].toString();
-            customerId= values["CustomerID"].toString();
+            customerId = values["CustomerID"].toString();
           });
         }
       });
     });
-    setState(() {
-      finalBalance = double.parse(oldBalance.text) -
-          (double.parse(paidCard.text) + double.parse(paidCash.text));
-      totalRecieved=(double.parse(paidCard.text) + double.parse(paidCash.text));
-      var total=totalRecieved.toStringAsFixed(User.decimals);
-      totalRecieved=double.parse(total);
-    });
+    // setState(() {
+    //   finalBalance = double.parse(oldBalance.text) -
+    //       (double.parse(paidCard.text) + double.parse(paidCash.text));
+    //   totalRecieved=(double.parse(paidCard.text) + double.parse(paidCash.text));
+    //   var total=totalRecieved.toStringAsFixed(2);
+    //   totalRecieved=double.parse(total);
+    // });
   }
-
-
 
   Future<List> getNames(String input) async {
     List _list = new List();
@@ -167,10 +170,16 @@ class SettlementPageState2 extends State<RecieptPortal> {
     await reference.child("Customers").once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key, values) {
-        if(values['Name'].toString().toLowerCase().contains(input.toLowerCase())){
+        if (values['Name']
+            .toString()
+            .toLowerCase()
+            .contains(input.toLowerCase())) {
           _list.add(values['Name'].toString());
         }
-        if(values['CustomerCode'].toString().toLowerCase().contains(input.toLowerCase())){
+        if (values['CustomerCode']
+            .toString()
+            .toLowerCase()
+            .contains(input.toLowerCase())) {
           _list.add(values['CustomerCode'].toString());
         }
       });
@@ -179,7 +188,6 @@ class SettlementPageState2 extends State<RecieptPortal> {
     return _list;
   }
 
-
   void initState() {
     // TODO: implement initState
     reference = FirebaseDatabase.instance
@@ -187,10 +195,10 @@ class SettlementPageState2 extends State<RecieptPortal> {
         .child("Companies")
         .child(User.database);
     GetVouchers().getVouchers();
-    paidCash.text="0";
-    paidCard.text="0";
+    paidCash.text = "0";
+    paidCard.text = "0";
 
-    voucherNo.text=User.cashReceiptNumber;
+    voucherNo.text = User.cashReceiptNumber;
     timer = Timer.periodic(duration, (Timer t) {
       getBalance();
     });
@@ -212,7 +220,6 @@ class SettlementPageState2 extends State<RecieptPortal> {
       appBar: buildAppBar(context),
       body: WillPopScope(
         onWillPop: () async {
-
           return true;
         },
         child: ListView(
@@ -241,6 +248,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16.0),
                       color: const Color(0xffffffff),
+                      // ignore: prefer_const_literals_to_create_immutables
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0x29000000),
@@ -268,22 +276,24 @@ class SettlementPageState2 extends State<RecieptPortal> {
               height: 20,
             ),
             Padding(
-              padding:
-              const EdgeInsets.all(5),
+              padding: const EdgeInsets.all(5),
               child: Row(
                 children: [
                   SizedBox(
                     width: 25,
                   ),
-                  Icon(Icons.person,),
+                  Icon(
+                    Icons.person,
+                  ),
                   SizedBox(
                     width: 10,
                   ),
                   Container(
-                    width: MediaQuery.of(context).size.width *  0.8,
+                    width: MediaQuery.of(context).size.width * 0.8,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16.0),
                       color: const Color(0xffffffff),
+                      // ignore: prefer_const_literals_to_create_immutables
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0x29000000),
@@ -293,8 +303,8 @@ class SettlementPageState2 extends State<RecieptPortal> {
                       ],
                     ),
                     child: TextFieldSearch(
-                      // future: getNames,
-                      // initialList: dummyList,
+                        // future: getNames,
+                        // initialList: dummyList,
                         label: label,
                         minStringLength: 0,
                         // getSelectedValue: () {
@@ -306,8 +316,8 @@ class SettlementPageState2 extends State<RecieptPortal> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Enter Customer Name / Code',
-                          contentPadding: EdgeInsets.only(
-                              left: 15, top: 1, right: 15),
+                          contentPadding:
+                              EdgeInsets.only(left: 15, top: 1, right: 15),
                           filled: false,
                           isDense: false,
                         ),
@@ -335,6 +345,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                     width: 10,
                   ),
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                           width: MediaQuery.of(context).size.width * 0.8,
@@ -342,6 +353,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16.0),
                             color: const Color(0xffffffff),
+                            // ignore: prefer_const_literals_to_create_immutables
                             boxShadow: [
                               BoxShadow(
                                 color: const Color(0x29000000),
@@ -355,19 +367,23 @@ class SettlementPageState2 extends State<RecieptPortal> {
                                 left: 15, bottom: 15, top: 15, right: 15),
                             child: Text(oldBalance.text),
                           )),
-                      Text(
-                        "Old Balance",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        child: Text(
+                          "Old Balance",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
                       )
                     ],
                   ),
-
                 ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
@@ -383,29 +399,35 @@ class SettlementPageState2 extends State<RecieptPortal> {
                         width: 10,
                       ),
                       Container(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16.0),
-                            color: const Color(0xffffffff),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0x29000000),
-                                offset: Offset(6, 3),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 15, bottom: 15, top: 15, right: 15),
-                            child: Text(finalBalance.toStringAsFixed(User.decimals)),
-                          )),
+                        width: MediaQuery.of(context).size.width * 0.8,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16.0),
+                          color: const Color(0xffffffff),
+                          // ignore: prefer_const_literals_to_create_immutables
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0x29000000),
+                              offset: Offset(6, 3),
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              left: 15, bottom: 15, top: 15, right: 15),
+                          child: Text(finalBalance.toStringAsFixed(2)),
+                        ),
+                      ),
                     ],
                   ),
-                  Text(
-                    "Current Balance",
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 70, vertical: 10),
+                    child: Text(
+                      "Current Balance",
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
                   )
                 ],
               ),
@@ -453,6 +475,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16.0),
                           color: const Color(0xffffffff),
+                          // ignore: prefer_const_literals_to_create_immutables
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x29000000),
@@ -478,6 +501,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                               width: MediaQuery.of(context).size.width * 0.3,
                               child: TextFormField(
                                   controller: paidCash,
+                                  keyboardType: TextInputType.number,
                                   onChanged: payOn,
                                   decoration: InputDecoration(
                                     hintText: '',
@@ -495,9 +519,12 @@ class SettlementPageState2 extends State<RecieptPortal> {
                           ],
                         ),
                       ),
-                      Text(
-                        "Paid via cash",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          "Paid via cash",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
                       )
                     ],
                   ),
@@ -512,6 +539,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16.0),
                           color: const Color(0xffffffff),
+                          // ignore: prefer_const_literals_to_create_immutables
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x29000000),
@@ -537,6 +565,7 @@ class SettlementPageState2 extends State<RecieptPortal> {
                               width: MediaQuery.of(context).size.width * 0.3,
                               child: TextFormField(
                                   controller: paidCard,
+                                  keyboardType: TextInputType.number,
                                   onChanged: payOn,
                                   decoration: InputDecoration(
                                     hintText: '',
@@ -553,9 +582,12 @@ class SettlementPageState2 extends State<RecieptPortal> {
                           ],
                         ),
                       ),
-                      Text(
-                        "Paid via card",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Text(
+                          "Paid via card",
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
                       )
                     ],
                   ),
@@ -566,13 +598,14 @@ class SettlementPageState2 extends State<RecieptPortal> {
               height: 20,
             ),
             Padding(
-              padding:  EdgeInsets.only(left:25,right: 20),
+              padding: EdgeInsets.only(left: 25, right: 20),
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: 50,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16.0),
                   color: const Color(0xffffffff),
+                  // ignore: prefer_const_literals_to_create_immutables
                   boxShadow: [
                     BoxShadow(
                       color: const Color(0x29000000),
@@ -599,15 +632,13 @@ class SettlementPageState2 extends State<RecieptPortal> {
                         child: Text(
                           "Total : ",
                           style: TextStyle(fontSize: 14, color: Colors.grey),
-                        )
-                    ),
+                        )),
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      child: Text(
-                        totalRecieved.toStringAsFixed(User.decimals),
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
-                      )
-                    ),
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        child: Text(
+                          totalRecieved.toStringAsFixed(2),
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        )),
                   ],
                 ),
               ),
@@ -618,13 +649,17 @@ class SettlementPageState2 extends State<RecieptPortal> {
             Center(
               child: GestureDetector(
                 onTap: () {
-                  if(voucherNo.text.isNotEmpty){
-                    if(paidCard.text.isNotEmpty||paidCash.text.isNotEmpty){
-                      addValues();
+                  if (voucherNo.text.isNotEmpty) {
+                    if (paidCard.text.isNotEmpty || paidCash.text.isNotEmpty) {
+                      if (paidCard.text != "0" && paidCash.text == "0") {
+                        addValues();
+                      } else {
+                        if (paidCard.text == "0" && paidCash.text != "0") {
+                          addValues();
+                        }
+                      }
                     }
-
                   }
-
                 },
                 child: Container(
                   height: 50,
@@ -634,12 +669,14 @@ class SettlementPageState2 extends State<RecieptPortal> {
                     gradient: LinearGradient(
                       begin: Alignment(0.01, -0.72),
                       end: Alignment(0.0, 1.0),
+                      // ignore: prefer_const_literals_to_create_immutables
                       colors: [
                         const Color(0xff385194),
                         const Color(0xff182d66)
                       ],
-                      stops: [0.0, 1.0],
+                      stops: const [0.0, 1.0],
                     ),
+                    // ignore: prefer_const_literals_to_create_immutables
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0x80182d66),

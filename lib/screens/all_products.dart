@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors
+
 import 'package:cybrix/data/user_data.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,7 +16,7 @@ class AllProductPage extends StatefulWidget {
 }
 
 class AllProductPageState extends State<AllProductPage> {
-  var name=TextEditingController();
+  var name = TextEditingController();
   DatabaseReference items;
   List<String> names = [];
   List<String> id = [];
@@ -37,28 +39,33 @@ class AllProductPageState extends State<AllProductPage> {
       List<dynamic> values = snapshot.value;
       for (int i = 0; i < values.length; i++) {
         if (values[i] != null) {
-          if(values[i]['ItemName'].toString().toLowerCase().contains(name.text.toLowerCase())) {
+          if (values[i]['ItemName']
+              .toString()
+              .toLowerCase()
+              .contains(name.text.toLowerCase())) {
             setState(() {
               names.add(values[i]['ItemName'].toString());
               id.add(values[i]['ItemID'].toString());
               unit.add(values[i]['SaleUnit'].toString());
-              salerate.add(values[i]['RateAndStock'][values[i]['SaleUnit']
-                  .toString()]['Rate'].toString());
-              purchaserate.add(values[i]['RateAndStock'][values[i]['SaleUnit']
-                  .toString()]['PurchaseRate'].toString());
-              stock.add(values[i]['RateAndStock'][values[i]['SaleUnit']
-                  .toString()]['Stock'][int.parse(User.vanNo)].toString());
+              salerate.add(values[i]['RateAndStock']
+                      [values[i]['SaleUnit'].toString()]['Rate']
+                  .toString());
+              purchaserate.add(values[i]['RateAndStock']
+                      [values[i]['SaleUnit'].toString()]['PurchaseRate']
+                  .toString());
+              stock.add(values[i]['RateAndStock']
+                          [values[i]['SaleUnit'].toString()]['Stock']
+                      [int.parse(User.vanNo)]
+                  .toString());
             });
           }
-
         }
       }
     });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
-
     items = FirebaseDatabase.instance
         .reference()
         .child("Companies")
@@ -101,7 +108,7 @@ class AllProductPageState extends State<AllProductPage> {
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left:15.0,right: 15),
+            padding: const EdgeInsets.only(left: 15.0, right: 15),
             child: Container(
               width: MediaQuery.of(context).size.width * 0.90,
               height: 50,
@@ -117,22 +124,22 @@ class AllProductPageState extends State<AllProductPage> {
                 ],
               ),
               child: TextFormField(
-                   controller: name,
+                  controller: name,
                   onChanged: getCustomerId,
                   decoration: InputDecoration(
-                hintText: 'Enter product name here',
-                //filled: true,
-                border: InputBorder.none,
-                contentPadding:
-                    EdgeInsets.only(left: 15, bottom: 5, top: 15, right: 15),
-                filled: false,
-                isDense: false,
-                prefixIcon: Icon(
-                  Icons.search,
-                  size: 25.0,
-                  color: Colors.grey,
-                ),
-              )),
+                    hintText: 'Enter product name here',
+                    //filled: true,
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.only(
+                        left: 15, bottom: 5, top: 15, right: 15),
+                    filled: false,
+                    isDense: false,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      size: 25.0,
+                      color: Colors.grey,
+                    ),
+                  )),
             ),
           ),
           // Padding(
@@ -228,7 +235,7 @@ class AllProductPageState extends State<AllProductPage> {
                                 width: 10,
                               ),
                               Text(
-                                'Code: '+id[index],
+                                'Code: ' + id[index],
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 8,
@@ -252,7 +259,10 @@ class AllProductPageState extends State<AllProductPage> {
                                   ),
                                   children: [
                                     TextSpan(
-                                      text: 'Unit: '+unit[index]+'\nIn Stock: '+stock[index],
+                                      text: 'Unit: ' +
+                                          unit[index] +
+                                          '\nIn Stock: ' +
+                                          stock[index],
                                     ),
                                   ],
                                 ),
@@ -338,7 +348,8 @@ class AllProductPageState extends State<AllProductPage> {
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.blue[900],
-      centerTitle: false,
+      automaticallyImplyLeading: widget.back,
+      centerTitle:  !widget.back,
       title: Text("Products"),
       elevation: 1.0,
       titleSpacing: 0,

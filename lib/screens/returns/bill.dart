@@ -1,7 +1,9 @@
 // @dart=2.9
+// ignore_for_file: avoid_single_cascade_in_expression_statements, prefer_const_constructors, sized_box_for_whitespace
+
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:cybrix/data/user_data.dart';
-import 'package:cybrix/ui_elements/bottomNavigation.dart';
+import 'package:cybrix/ui_elements/bottom_navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:screenshot/screenshot.dart';
@@ -167,7 +169,7 @@ class BillPageState extends State<BillPage> {
         bluetooth.printCustom(User.database.toUpperCase(), 3, 1);
         bluetooth.printNewLine();
         bluetooth.printCustom(User.address, 0, 1);
-        bluetooth.printCustom("TRN No."+User.trno, 0, 1);
+        bluetooth.printCustom("TRN No." + User.trno, 0, 1);
         bluetooth.printNewLine();
         bluetooth.printCustom("RETURN INVOICE", 2, 1);
         bluetooth.printCustom("-------------------------------", 0, 1);
@@ -178,7 +180,7 @@ class BillPageState extends State<BillPage> {
         bluetooth.printLeftRight("Address: ", "", 0);
         bluetooth.printLeftRight("TRN No.11112223", "", 0);
         bluetooth.printLeftRight("Date & Time: " + billTime, "", 0);
-        bluetooth.printLeftRight("Salesman:"+User.name, "", 0);
+        bluetooth.printLeftRight("Salesman:" + User.name, "", 0);
         bluetooth.printCustom("-------------------------------", 0, 1);
         bluetooth.printCustom("Item Name           Qty   Amount", 0, 0);
         bluetooth.printCustom("-------------------------------", 0, 1);
@@ -193,7 +195,7 @@ class BillPageState extends State<BillPage> {
         bluetooth.printLeftRight("Total Qty: " + totalQty.toString(), "", 0);
         bluetooth.printLeftRight("Grand Total: " + bill, " ", 0);
         bluetooth.printLeftRight("Discount: " + totalDisc, " ", 0);
-       // bluetooth.printLeftRight("RoundOff: " + roundOff, " ", 0);
+        // bluetooth.printLeftRight("RoundOff: " + roundOff, " ", 0);
         bluetooth.printLeftRight("Vat (5%): " + totaltax, " ", 0);
         bluetooth.printLeftRight("Net Amount: " + totalBill, " ", 1);
         bluetooth.printNewLine();
@@ -257,9 +259,9 @@ class BillPageState extends State<BillPage> {
             setState(() {
               item.add(value[i]['ItemName'].toString());
               qty.add(value[i]['Qty'].toString());
-              tax.add(value[i]['TaxAmount'].toStringAsFixed(User.decimals));
-              total.add(value[i]['Total'].toStringAsFixed(User.decimals));
-              rate.add(value[i]['Rate'].toStringAsFixed(User.decimals));
+              tax.add(value[i]['TaxAmount'].toStringAsFixed(2));
+              total.add(value[i]['Total'].toStringAsFixed(2));
+              rate.add(value[i]['Rate'].toStringAsFixed(2));
             });
           }
         }
@@ -285,8 +287,8 @@ class BillPageState extends State<BillPage> {
     });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
     reference = FirebaseDatabase.instance
         .reference()
         .child("Companies")

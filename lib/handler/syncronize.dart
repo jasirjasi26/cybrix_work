@@ -2,6 +2,7 @@ import 'package:api_cache_manager/utils/cache_manager.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:cybrix/data/user_data.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'databasehelper.dart';
 import 'contactinfomodel.dart';
 import 'package:http/http.dart' as http;
@@ -50,91 +51,110 @@ class SyncronizationData {
 
   Future saveToMysqlWith(List<ContactinfoModel> contactList) async {
     String urlorder =
-        "https://cybrixproject1-default-rtdb.firebaseio.com/Companies/"+User.database+"/";
-
-print(urlorder);
+        "https://cybrixproject1-default-rtdb.firebaseio.com/Companies/" +
+            User.database +
+            "/";
 
     if (await DataConnectionChecker().hasConnection) {
       for (var i = 0; i < contactList.length; i++) {
-
         if (contactList[i].createdAt.toString() == "Order") {
-          String orderUrl1 = urlorder+"Order/"+User.vanNo+"/" + contactList[i].userId.toString() +
+          String orderUrl1 = urlorder +
+              "Order/" +
+              contactList[i].email.toString() +
+              "/" +
+              User.vanNo +
+              "/" +
+              contactList[i].userId.toString() +
               ".json";
+          if (await APICacheManager()
+              .isAPICacheKeyExist(contactList[i].userId.toString())) {
+            var cacheData =
+                await APICacheManager().getCacheData(contactList[i].userId);
+            final response = await http.put(
+              orderUrl1,
+              body: cacheData.syncData,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            );
 
-          var cacheData = await APICacheManager()
-              .getCacheData(contactList[i].userId);
-
-          final response = await http.put(
-            orderUrl1,
-            body: cacheData.syncData,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          );
-
-          if (response.statusCode == 200) {
-            print("Saving Data ");
-            await APICacheManager().deleteCache(
-                contactList[i].userId.toString());
-          } else {
-            print("Failed Saving Data ");
+            if (response.statusCode == 200) {
+              await APICacheManager()
+                  .deleteCache(contactList[i].userId.toString());
+            } else {
+              print("Failed Saving Data ");
+            }
           }
         }
 
         if (contactList[i].createdAt.toString() == "Invoice") {
-          String orderUrl2 = urlorder +"Bills/"+contactList[i].email.toString()+"/"+User.vanNo+"/"+ contactList[i].userId.toString() +
+          String orderUrl2 = urlorder +
+              "Bills/" +
+              contactList[i].email.toString() +
+              "/" +
+              User.vanNo +
+              "/" +
+              contactList[i].userId.toString() +
               ".json";
-          var cacheData = await APICacheManager()
-              .getCacheData(contactList[i].userId.toString());
+          if (await APICacheManager()
+              .isAPICacheKeyExist(contactList[i].userId.toString())) {
+            var cacheData = await APICacheManager()
+                .getCacheData(contactList[i].userId.toString());
 
-          final response = await http.put(
-            orderUrl2,
-            body: cacheData.syncData,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          );
+            final response = await http.put(
+              orderUrl2,
+              body: cacheData.syncData,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            );
 
-          if (response.statusCode == 200) {
-            print("Saving Data ");
-            await APICacheManager().deleteCache(
-                contactList[i].userId.toString());
-          } else {
-            print("Failed Saving Data ");
+            if (response.statusCode == 200) {
+              print("Saving Data ");
+              await APICacheManager()
+                  .deleteCache(contactList[i].userId.toString());
+            } else {
+              print("Failed Saving Data ");
+            }
           }
         }
 
         if (contactList[i].createdAt.toString() == "Return") {
-          String orderUrl3 = urlorder +"Returns/"+contactList[i].email.toString()+"/"+User.vanNo+"/"+contactList[i].userId.toString() +
+          String orderUrl3 = urlorder +
+              "Returns/" +
+              contactList[i].email.toString() +
+              "/" +
+              User.vanNo +
+              "/" +
+              contactList[i].userId.toString() +
               ".json";
-          var cacheData = await APICacheManager()
-              .getCacheData(contactList[i].userId.toString());
 
-          
-          final response = await http.put(
-            orderUrl3,
-            body: cacheData.syncData,
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          );
+          if (await APICacheManager()
+              .isAPICacheKeyExist(contactList[i].userId.toString())) {
+            var cacheData = await APICacheManager()
+                .getCacheData(contactList[i].userId.toString());
+            final response = await http.put(
+              orderUrl3,
+              body: cacheData.syncData,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              },
+            );
 
-          if (response.statusCode == 200) {
-            print("Saving Data ");
-            await APICacheManager().deleteCache(
-                contactList[i].userId.toString());
-          } else {
-            print("Failed Saving Data ");
+            if (response.statusCode == 200) {
+              print("Saving Data ");
+              await APICacheManager()
+                  .deleteCache(contactList[i].userId.toString());
+            } else {
+              print("Failed Saving Data ");
+            }
           }
         }
       }
-
     }
-
-
   }
 
   Future<List> fetchAllCustoemrInfo() async {
@@ -151,24 +171,24 @@ print(urlorder);
     return contactList;
   }
 
-  // Future saveToMysql(List contactList) async {
-  //   for (var i = 0; i < contactList.length; i++) {
-  //     Map<String, dynamic> data = {
-  //       "contact_id": contactList[i]['id'].toString(),
-  //       "user_id": contactList[i]['user_id'].toString(),
-  //       "name": contactList[i]['name'],
-  //       "email": contactList[i]['email'],
-  //       "gender": contactList[i]['gender'],
-  //       "created_at": contactList[i]['created_at'],
-  //     };
-  //     final response = await http.post(
-  //         'http://192.168.43.6/syncsqftomysqlflutter/load_from_sqflite_contactinfo_table_save_or_update_to_mysql.php',
-  //         body: data);
-  //     if (response.statusCode == 200) {
-  //       print("Saving Data ");
-  //     } else {
-  //       print(response.statusCode);
-  //     }
-  //   }
-  // }
+// Future saveToMysql(List contactList) async {
+//   for (var i = 0; i < contactList.length; i++) {
+//     Map<String, dynamic> data = {
+//       "contact_id": contactList[i]['id'].toString(),
+//       "user_id": contactList[i]['user_id'].toString(),
+//       "name": contactList[i]['name'],
+//       "email": contactList[i]['email'],
+//       "gender": contactList[i]['gender'],
+//       "created_at": contactList[i]['created_at'],
+//     };
+//     final response = await http.post(
+//         'http://192.168.43.6/syncsqftomysqlflutter/load_from_sqflite_contactinfo_table_save_or_update_to_mysql.php',
+//         body: data);
+//     if (response.statusCode == 200) {
+//       print("Saving Data ");
+//     } else {
+//       print(response.statusCode);
+//     }
+//   }
+// }
 }

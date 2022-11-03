@@ -1,6 +1,8 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_final_fields, prefer_const_constructors
+
 import 'package:cybrix/screens/splash.dart';
-import 'package:cybrix/ui_elements/bottomNavigation.dart';
+import 'package:cybrix/ui_elements/bottom_navigation.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,15 +43,16 @@ class _OtpState extends State<Otp> {
         .child("Companies")
         .child(user.User.database);
 
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
     super.initState();
   }
 
   @override
   void dispose() {
     //before going to other screen show statusbar
-    SystemChrome.setEnabledSystemUIOverlays(
-        [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     super.dispose();
   }
 
@@ -57,26 +60,26 @@ class _OtpState extends State<Otp> {
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: widget.phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance
-              .signInWithCredential(credential)
-              .then((value) async {
-            if (value.user != null) {
-              // ToastComponent.showDialog("Authentication Success", context,
-              //     gravity: Toast.CENTER, duration: Toast.LENGTH_LONG);
+          // await FirebaseAuth.instance
+          //     .signInWithCredential(credential)
+          //     .then((value) async {
+          //   if (value.user != null) {
+          //     // ToastComponent.showDialog("Authentication Success", context,
+          //     //     gravity: Toast.CENTER, duration: Toast.LENGTH_LONG);
 
-            } else {
-              FlutterFlexibleToast.showToast(
-                  message: "Invalid OTP",
-                  toastGravity: ToastGravity.BOTTOM,
-                  icon: ICON.ERROR,
-                  radius: 50,
-                  elevation: 10,
-                  imageSize: 15,
-                  textColor: Colors.white,
-                  backgroundColor: Colors.black,
-                  timeInSeconds: 2);
-            }
-          });
+          //   } else {
+          //     FlutterFlexibleToast.showToast(
+          //         message: "Invalid OTP",
+          //         toastGravity: ToastGravity.BOTTOM,
+          //         icon: ICON.ERROR,
+          //         radius: 50,
+          //         elevation: 10,
+          //         imageSize: 15,
+          //         textColor: Colors.white,
+          //         backgroundColor: Colors.black,
+          //         timeInSeconds: 2);
+          //   }
+          // });
         },
         verificationFailed: (FirebaseAuthException e) {
           print(e.message);
@@ -122,14 +125,16 @@ class _OtpState extends State<Otp> {
       return;
     } else {
       try {
+        print("111111");
         await FirebaseAuth.instance
             .signInWithCredential(PhoneAuthProvider.credential(
                 verificationId: verificationCode, smsCode: code))
             .then((value) async {
+          print("22222");
           if (value.user != null) {
-            print("Authorization is okay");
-
+            print("333333");
             await numbers.child("USERS").once().then((DataSnapshot snapshot) {
+              print("44444");
               Map<dynamic, dynamic> values = snapshot.value;
               values.forEach((key, values) async {
                 if (widget.phone == values["ID"].toString()) {
@@ -138,10 +143,13 @@ class _OtpState extends State<Otp> {
                       values["Name"].toString() != null &&
                       values["Name"].toString() != "" &&
                       values["VanNO"].toString() != null &&
-                      values["VanNO"].toString() != "") {
+                      values["VanNO"].toString() != "" &&
+                      values["VanName"].toString() != null &&
+                      values["VanName"].toString() != "") {
                     user.User.number = values["ID"].toString();
                     user.User.name = values["Name"].toString();
                     user.User.vanNo = values["VanNO"].toString();
+                    user.User.vanName = values["VanName"].toString();
 
                     await numbers
                         .child("Details")
@@ -151,7 +159,8 @@ class _OtpState extends State<Otp> {
 
                       user.User.address = values['Address'].toString();
                       user.User.companyName = values['CompanyName'].toString();
-                      user.User.trno = values['TRNNo'].toString();
+                      user.User.trno = values['TRNNO'].toString();
+                      user.User.imageUrl = values['ImageUrl'].toString();
 
                       user.User().addUser();
                       FlutterFlexibleToast.showToast(
@@ -199,13 +208,13 @@ class _OtpState extends State<Otp> {
           }
         });
       } catch (e) {
+        print(e);
         user.User().clear();
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Splash();
-        }));
+        // Navigator.push(context, MaterialPageRoute(builder: (context) {
+        //   return Splash();
+        // }));
         EasyLoading.showError('User not found');
         FocusScope.of(context).unfocus();
-        print("nooo");
       }
     }
   }
@@ -261,7 +270,7 @@ class _OtpState extends State<Otp> {
                   child: Text(
                     widget.phone,
                     style: TextStyle(
-                      //color: MyTheme.accent_color,
+                        //color: MyTheme.accent_color,
                         fontSize: 16,
                         fontWeight: FontWeight.w600),
                   ),
@@ -290,6 +299,7 @@ class _OtpState extends State<Otp> {
                             Container(
                               height: 36,
                               child: TextField(
+                                keyboardType: TextInputType.number,
                                 controller: _verificationCodeController,
                                 autofocus: false,
                                 // decoration:

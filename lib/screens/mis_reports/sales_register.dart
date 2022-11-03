@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+
 import 'package:cybrix/data/user_data.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -73,7 +75,6 @@ class SalesRegisterState extends State<SalesRegister> {
     getCustomerId(from);
   }
 
-
   Future<void> getCustomerId(String date) async {
     setState(() {
       dates.clear();
@@ -82,10 +83,6 @@ class SalesRegisterState extends State<SalesRegister> {
       paid.clear();
       balance.clear();
     });
-
-
-
-
 
     await reference.child("SalesReport").once().then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
@@ -99,14 +96,21 @@ class SalesRegisterState extends State<SalesRegister> {
         String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
 
         if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
-            DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
+                DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
             DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
             DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
           print(key);
-          await reference.child("SalesReport").child(key).once().then((DataSnapshot snapshot) {
+          await reference
+              .child("SalesReport")
+              .child(key)
+              .once()
+              .then((DataSnapshot snapshot) {
             Map<dynamic, dynamic> values = snapshot.value;
             values.forEach((key, values) {
-              if(values['PartyName'].toString().toLowerCase().contains(name.text.toLowerCase())){
+              if (values['PartyName']
+                  .toString()
+                  .toLowerCase()
+                  .contains(name.text.toLowerCase())) {
                 setState(() {
                   dates.add(values['Date'].toString());
                   party.add(values['PartyName'].toString());
@@ -117,13 +121,11 @@ class SalesRegisterState extends State<SalesRegister> {
               }
             });
           });
-
         } else {
           print("Noo data");
         }
       });
     });
-
   }
 
   void initState() {
@@ -132,11 +134,10 @@ class SalesRegisterState extends State<SalesRegister> {
         .reference()
         .child("Companies")
         .child(User.database);
-getCustomerId(from);
+    getCustomerId(from);
 
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -157,27 +158,24 @@ getCustomerId(from);
 
   searchRow() {
     return Container(
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       height: 105,
       child: Column(
         children: [
           Row(
             children: [
-              SizedBox(width: 10,),
+              SizedBox(
+                width: 10,
+              ),
               Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.9,
+                  width: MediaQuery.of(context).size.width * 0.9,
                   height: 50,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5.0),
                     color: const Color(0xffffffff),
+                    // ignore: prefer_const_literals_to_create_immutables
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0x29000000),
@@ -187,7 +185,7 @@ getCustomerId(from);
                     ],
                   ),
                   child: TextFormField(
-                     controller: name,
+                      controller: name,
                       onChanged: getCustomerId,
                       decoration: InputDecoration(
                         hintText: 'Enter customer name here',
@@ -207,7 +205,9 @@ getCustomerId(from);
               ),
             ],
           ),
-          SizedBox(height: 10,),
+          SizedBox(
+            height: 10,
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
@@ -225,7 +225,7 @@ getCustomerId(from);
                   width: 10,
                 ),
                 GestureDetector(
-                  onTap:(){
+                  onTap: () {
                     _selectDate(context);
                   },
                   child: Text(
@@ -254,7 +254,7 @@ getCustomerId(from);
                   width: 10,
                 ),
                 GestureDetector(
-                  onTap:(){
+                  onTap: () {
                     _selectToDate(context);
                   },
                   child: Text(
@@ -277,52 +277,25 @@ getCustomerId(from);
 
   salesOrder() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Container(
-        width: 600,
-        height: MediaQuery.of(context).size.height,
-        child: ListView(
-        children: [
-          Container(
-            height: 30,
-            decoration: BoxDecoration(
-              color: const Color(0xff454d60),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Sl No',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 12,
-                      color: const Color(0xffffffff),
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          width: 600,
+          height: MediaQuery.of(context).size.height,
+          child: ListView(
+            children: [
+              Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xff454d60),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Date',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 12,
-                      color: const Color(0xffffffff),
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-                Container(
-                  width: 200,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Center(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        'Party',
+                        'Sl No',
                         style: TextStyle(
                           fontFamily: 'Arial',
                           fontSize: 12,
@@ -331,102 +304,96 @@ getCustomerId(from);
                         textAlign: TextAlign.left,
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Grand Amt',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 12,
-                      color: const Color(0xffffffff),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Date',
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 12,
+                          color: const Color(0xffffffff),
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
                     ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Paid',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 12,
-                      color: const Color(0xffffffff),
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Balance',
-                    style: TextStyle(
-                      fontFamily: 'Arial',
-                      fontSize: 12,
-                      color: const Color(0xffffffff),
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            height: MediaQuery
-                .of(context)
-                .size
-                .height * 0.7,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width,
-
-            child: new ListView(
-              children: new List.generate(dates.length, (index) =>
-                  Container(
-                    height: 30,
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    decoration: BoxDecoration(
-                      color: index.floor().isEven ? Color(0x66d6d6d6) : Color(0x66f3ceef),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
+                    Container(
+                      width: 200,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
                           child: Text(
-                            index.toString(),
+                            'Party',
                             style: TextStyle(
                               fontFamily: 'Arial',
                               fontSize: 12,
-                              color:  Colors.black,
+                              color: const Color(0xffffffff),
                             ),
                             textAlign: TextAlign.left,
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            dates[index],
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 12,
-                              color:  Colors.black,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Grand Amt',
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 12,
+                          color: const Color(0xffffffff),
                         ),
-                        Container(
-                          width: 200,
-                          child: Padding(
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Paid',
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 12,
+                          color: const Color(0xffffffff),
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Balance',
+                        style: TextStyle(
+                          fontFamily: 'Arial',
+                          fontSize: 12,
+                          color: const Color(0xffffffff),
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                width: MediaQuery.of(context).size.width,
+                child: new ListView(
+                  children: new List.generate(
+                    dates.length,
+                    (index) => Container(
+                      height: 30,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: index.floor().isEven
+                            ? Color(0x66d6d6d6)
+                            : Color(0x66f3ceef),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              party[index],
+                              index.toString(),
                               style: TextStyle(
                                 fontFamily: 'Arial',
                                 fontSize: 12,
@@ -435,51 +402,78 @@ getCustomerId(from);
                               textAlign: TextAlign.left,
                             ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            amount[index],
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 12,
-                              color: Colors.black,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              dates[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
                             ),
-                            textAlign: TextAlign.left,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            paid[index],
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 12,
-                              color: Colors.black,
+                          Container(
+                            width: 200,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                party[index],
+                                style: TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.left,
+                              ),
                             ),
-                            textAlign: TextAlign.left,
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            balance[index],
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 12,
-                              color: Colors.black,
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              amount[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
                             ),
-                            textAlign: TextAlign.left,
                           ),
-                        )
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              paid[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              balance[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),),
-            ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
+        ));
   }
 
   AppBar buildAppBar(BuildContext context) {

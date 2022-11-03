@@ -8,61 +8,54 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'customed_details.dart';
 
-class GetCustomerDetails{
+class GetCustomerDetails {
   Future<void> getCustomerId(String customerName) async {
-
     if (await DataConnectionChecker().hasConnection) {
       await FirebaseDatabase.instance
           .reference()
           .child("Companies")
           .child(User.database)
-          .child("Customers").once().then((DataSnapshot snapshot) async {
+          .child("Customers")
+          .once()
+          .then((DataSnapshot snapshot) async {
         Map<dynamic, dynamic> values = snapshot.value;
         APICacheDBModel cacheDBModel =
-        new APICacheDBModel(key: "customers", syncData: jsonEncode(values));
+            new APICacheDBModel(key: "customers", syncData: jsonEncode(values));
 
         await APICacheManager().addCacheData(cacheDBModel);
         var cacheData = await APICacheManager().getCacheData("customers");
 
         jsonDecode(cacheData.syncData).forEach((key, values) {
           if (customerName == values["Name"]) {
-
             Customer.CustomerId = values["CustomerID"];
             double a = double.parse(values["Balance"]);
-            Customer.balance = a.toStringAsFixed(User.decimals);
+            Customer.balance = a.toStringAsFixed(2);
             Customer.CustomerName = values["Name"].toString();
-
           } else {
             if (customerName == values["CustomerCode"]) {
-
               Customer.CustomerId = values["CustomerID"];
               double a = double.parse(values["Balance"]);
-              Customer.balance = a.toStringAsFixed(User.decimals);
+              Customer.balance = a.toStringAsFixed(2);
               Customer.CustomerName = values["Name"].toString();
             }
           }
         });
-
       });
-    }
-    else{
+    } else {
       var cacheData = await APICacheManager().getCacheData("customers");
 
       jsonDecode(cacheData.syncData).forEach((key, values) {
         if (customerName == values["Name"]) {
-
-            Customer.CustomerId = values["CustomerID"];
-            double a = double.parse(values["Balance"]);
-            Customer.balance = a.toStringAsFixed(User.decimals);
-            Customer.CustomerName = values["Name"].toString();
-
+          Customer.CustomerId = values["CustomerID"];
+          double a = double.parse(values["Balance"]);
+          Customer.balance = a.toStringAsFixed(2);
+          Customer.CustomerName = values["Name"].toString();
         } else {
           if (customerName == values["CustomerCode"]) {
-
-              Customer.CustomerId = values["CustomerID"];
-              double a = double.parse(values["Balance"]);
-              Customer.balance = a.toStringAsFixed(User.decimals);
-              Customer.CustomerName = values["Name"].toString();
+            Customer.CustomerId = values["CustomerID"];
+            double a = double.parse(values["Balance"]);
+            Customer.balance = a.toStringAsFixed(2);
+            Customer.CustomerName = values["Name"].toString();
           }
         }
       });

@@ -7,9 +7,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:cybrix/data/user_data.dart';
 import 'package:cybrix/screens/login.dart';
-import 'package:cybrix/ui_elements/bottomNavigation.dart';
+import 'package:cybrix/ui_elements/bottom_navigation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class Splash extends StatefulWidget {
   @override
@@ -17,28 +16,35 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
-
   getUser() async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
     String name = prefs.getString("name");
     String number = prefs.getString("number");
     String vanNumber = prefs.getString("vanNo");
-    String dbs=prefs.getString("database");
-    String company=prefs.getString("companyName");
-    String trno=prefs.getString("trno");
-    String address=prefs.getString("address");
-    int decimal=prefs.getInt("decimal");
+    String vanName = prefs.getString("vanName");
+    String dbs = prefs.getString("database");
+    String company = prefs.getString("companyName");
+    String trno = prefs.getString("trno");
+    String address = prefs.getString("address");
+    int decimal = prefs.getInt("decimal");
 
-    if (name != null && number != null && name!="" && number != "" && dbs != "" && vanNumber != "" ) {
+    if (name != null &&
+        number != null &&
+        name != "" &&
+        number != "" &&
+        dbs != "" &&
+        vanNumber != "" &&
+        vanName != "") {
       User.number = number;
       User.name = name;
       User.vanNo = vanNumber;
-      User.database=dbs;
-      User.trno=trno;
-      User.companyName=company;
-      User.address=address;
-      User.decimals=decimal;
+      User.vanName = vanName;
+      User.database = dbs;
+      User.trno = trno;
+      User.companyName = company;
+      User.address = address;
+      User.decimals = decimal;
 
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return BottomBar();
@@ -52,12 +58,9 @@ class _SplashState extends State<Splash> {
     SystemChrome.setEnabledSystemUIOverlays(
         [SystemUiOverlay.bottom, SystemUiOverlay.top]);
 
-
     getUser();
     super.initState();
   }
-
-
 
   @override
   void dispose() {
@@ -108,19 +111,18 @@ class _SplashState extends State<Splash> {
                     ),
                     textAlign: TextAlign.left,
                   ),
-
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.25,
                   ),
-                  SizedBox(height: 30,),
+                  SizedBox(
+                    height: 30,
+                  ),
                   GestureDetector(
                     onTap: () async {
-
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                              return Login();
-                            }));
-
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return Login();
+                      }));
                     },
                     child: Container(
                       padding: EdgeInsets.only(

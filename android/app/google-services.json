@@ -74,43 +74,6 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:782174638682:android:0749ebc6233cab03b93e63",
-        "android_client_info": {
-          "package_name": "com.example.optimist_erp_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "782174638682-sle0h05i8i8n8cc5ipm2vqruple9jfr5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.optimist_erp_app",
-            "certificate_hash": "83b06fb128808eeba36841c444255b9ecc9b15a8"
-          }
-        },
-        {
-          "client_id": "782174638682-uamlncf7b55qlci7dg48klursffprpum.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDtbgwnFVX9NeHY-Vg-Vn-PUiVjhH46YsA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "782174638682-uamlncf7b55qlci7dg48klursffprpum.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:782174638682:android:9ab0ee329eff8af7b93e63",
         "android_client_info": {
           "package_name": "com.optimist.cybrix"
@@ -118,40 +81,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "782174638682-uamlncf7b55qlci7dg48klursffprpum.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDtbgwnFVX9NeHY-Vg-Vn-PUiVjhH46YsA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "782174638682-uamlncf7b55qlci7dg48klursffprpum.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:782174638682:android:04faf6191f728783b93e63",
-        "android_client_info": {
-          "package_name": "com.optimist.optimist_erp_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "782174638682-92m9egjcphtk52o5g4q2vnoef6pfett1.apps.googleusercontent.com",
+          "client_id": "782174638682-5pk9catoqjbtrmlf25n1gj642pre3i97.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.optimist.optimist_erp_app",
-            "certificate_hash": "83b06fb128808eeba36841c444255b9ecc9b15a8"
+            "package_name": "com.optimist.cybrix",
+            "certificate_hash": "ea40e081c6c03df7455490c77f82407d8b090cc1"
           }
         },
         {

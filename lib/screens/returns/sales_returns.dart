@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: sized_box_for_whitespace, prefer_const_constructors
+
 import 'dart:convert';
 
 import 'package:api_cache_manager/models/cache_db_model.dart';
@@ -15,7 +17,6 @@ import 'dart:ui';
 import 'package:textfield_search/textfield_search.dart';
 import 'package:adobe_xd/page_link.dart';
 import 'package:adobe_xd/pinned.dart';
-
 
 class ReturnsPage extends StatefulWidget {
   @override
@@ -36,7 +37,7 @@ class ReturnsPageState extends State<ReturnsPage> {
   DatabaseReference allnames;
   String label = "Enter Customer Name";
   List<String> _locations = []; // Option 2
-  String _selectedLocation='[None]'; //
+  String _selectedLocation = '[None]'; //
   DatabaseReference types; // Opt
 
   DateTime selectedDate = DateTime.now();
@@ -53,21 +54,18 @@ class ReturnsPageState extends State<ReturnsPage> {
       DateTime.now().day.toString();
 
   Future<void> getSalesTypes() async {
-
-    if(await DataConnectionChecker().hasConnection){
+    if (await DataConnectionChecker().hasConnection) {
       await types.once().then((DataSnapshot snapshot) async {
         Map<dynamic, dynamic> values = snapshot.value;
         values.forEach((key, values) {
           _locations.add(values["Name"].toString());
         });
 
-
-        APICacheDBModel cacheDBModel =
-        new APICacheDBModel(key: "salestypes", syncData: jsonEncode(snapshot.value));
+        APICacheDBModel cacheDBModel = APICacheDBModel(
+            key: "salestypes", syncData: jsonEncode(snapshot.value));
         await APICacheManager().addCacheData(cacheDBModel);
       });
-    }
-    else{
+    } else {
       var cacheData = await APICacheManager().getCacheData("salestypes");
       jsonDecode(cacheData.syncData).forEach((key, values) {
         _locations.add(values["Name"].toString());
@@ -81,7 +79,7 @@ class ReturnsPageState extends State<ReturnsPage> {
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         from = selectedDate.year.toString() +
@@ -90,6 +88,7 @@ class ReturnsPageState extends State<ReturnsPage> {
             "-" +
             selectedDate.day.toString();
       });
+    }
 
     getCustomerId(from);
   }
@@ -100,7 +99,7 @@ class ReturnsPageState extends State<ReturnsPage> {
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         to = selectedDate.year.toString() +
@@ -109,84 +108,76 @@ class ReturnsPageState extends State<ReturnsPage> {
             "-" +
             selectedDate.day.toString();
       });
+    }
 
     getCustomerId(from);
   }
 
-
   Future<void> authenticate(String text) async {
-
-
     if (await DataConnectionChecker().hasConnection) {
       await allnames.once().then((DataSnapshot snapshot) async {
         Map<dynamic, dynamic> values = snapshot.value;
         APICacheDBModel cacheDBModel =
-        new APICacheDBModel(key: "customers", syncData: jsonEncode(values));
+            APICacheDBModel(key: "customers", syncData: jsonEncode(values));
         await APICacheManager().addCacheData(cacheDBModel);
         var cacheData = await APICacheManager().getCacheData("customers");
 
         jsonDecode(cacheData.syncData).forEach((key, values) {
           if (text == values["Name"]) {
             GetCustomerDetails().getCustomerId(text).whenComplete(() => {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return SalesReturn(
                       customerName: text,
                       refNo: "0",
                       salesType: _selectedLocation,
                     );
                   }))
-            });
+                });
           } else {
             if (text == values["CustomerCode"]) {
               GetCustomerDetails().getCustomerId(text).whenComplete(() => {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
                       return SalesReturn(
                         customerName: text,
                         refNo: "0",
                         salesType: _selectedLocation,
                       );
                     }))
-              });
-
+                  });
             }
           }
         });
       });
-    }else{
+    } else {
       var cacheData = await APICacheManager().getCacheData("customers");
 
       jsonDecode(cacheData.syncData).forEach((key, values) {
         if (text == values["Name"]) {
           GetCustomerDetails().getCustomerId(text).whenComplete(() => {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return SalesReturn(
                     customerName: text,
                     refNo: "0",
                     salesType: _selectedLocation,
                   );
                 }))
-
-          });
+              });
         } else {
           if (text == values["CustomerCode"]) {
             GetCustomerDetails().getCustomerId(text).whenComplete(() => {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return SalesReturn(
                       customerName: text,
                       refNo: "0",
                       salesType: _selectedLocation,
                     );
                   }))
-            });
+                });
           }
         }
       });
     }
-
   }
 
   Future<void> getCustomerId(String customer) async {
@@ -248,8 +239,8 @@ class ReturnsPageState extends State<ReturnsPage> {
     });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
     reference = FirebaseDatabase.instance
         .reference()
         .child("Companies")
@@ -293,7 +284,7 @@ class ReturnsPageState extends State<ReturnsPage> {
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius:
-                    BorderRadius.all(Radius.elliptical(9999.0, 9999.0)),
+                        BorderRadius.all(Radius.elliptical(9999.0, 9999.0)),
                     gradient: LinearGradient(
                       begin: Alignment(-2.74, -2.92),
                       end: Alignment(0.73, 0.78),
@@ -317,8 +308,8 @@ class ReturnsPageState extends State<ReturnsPage> {
                 Pin(size: 18.6, middle: 0.4153),
                 Pin(size: 24.2, middle: 0.3096),
                 child:
-                // Adobe XD layer: 'surface1' (group)
-                Stack(
+                    // Adobe XD layer: 'surface1' (group)
+                    Stack(
                   children: <Widget>[
                     Pinned.fromPins(
                       Pin(start: 0.0, end: 0.0),
@@ -400,7 +391,6 @@ class ReturnsPageState extends State<ReturnsPage> {
     );
   }
 
-
   void showBookingDialog() {
     var textEditingController = TextEditingController();
     Future<List> getNames(String input) async {
@@ -409,28 +399,40 @@ class ReturnsPageState extends State<ReturnsPage> {
       if (await DataConnectionChecker().hasConnection) {
         await allnames.once().then((DataSnapshot snapshot) async {
           Map<dynamic, dynamic> values = snapshot.value;
-          APICacheDBModel cacheDBModel =
-          new APICacheDBModel(key: "customers", syncData: jsonEncode(values));
+          APICacheDBModel cacheDBModel = new APICacheDBModel(
+              key: "customers", syncData: jsonEncode(values));
           await APICacheManager().addCacheData(cacheDBModel);
           var cacheData = await APICacheManager().getCacheData("customers");
 
           jsonDecode(cacheData.syncData).forEach((key, values) {
-            if(values['Name'].toString().toLowerCase().contains(input.toLowerCase())){
+            if (values['Name']
+                .toString()
+                .toLowerCase()
+                .contains(input.toLowerCase())) {
               _list.add(values['Name'].toString());
             }
-            if(values['CustomerCode'].toString().toLowerCase().contains(input.toLowerCase())){
+            if (values['CustomerCode']
+                .toString()
+                .toLowerCase()
+                .contains(input.toLowerCase())) {
               _list.add(values['CustomerCode'].toString());
             }
           });
         });
-      }else{
+      } else {
         var cacheData = await APICacheManager().getCacheData("customers");
 
         jsonDecode(cacheData.syncData).forEach((key, values) {
-          if(values['Name'].toString().toLowerCase().contains(input.toLowerCase())){
+          if (values['Name']
+              .toString()
+              .toLowerCase()
+              .contains(input.toLowerCase())) {
             _list.add(values['Name'].toString());
           }
-          if(values['CustomerCode'].toString().toLowerCase().contains(input.toLowerCase())){
+          if (values['CustomerCode']
+              .toString()
+              .toLowerCase()
+              .contains(input.toLowerCase())) {
             _list.add(values['CustomerCode'].toString());
           }
         });
@@ -488,12 +490,12 @@ class ReturnsPageState extends State<ReturnsPage> {
                           ),
                           Padding(
                             padding:
-                            const EdgeInsets.only(left: 50.0, right: 50),
+                                const EdgeInsets.only(left: 50.0, right: 50),
                             child: Card(
                               elevation: 5,
                               child: TextFieldSearch(
-                                // future: getNames,
-                                // initialList: dummyList,
+                                  // future: getNames,
+                                  // initialList: dummyList,
                                   label: label,
                                   minStringLength: 0,
                                   future: () {
@@ -522,7 +524,7 @@ class ReturnsPageState extends State<ReturnsPage> {
                             child: Text(
                               " Select Sales Type",
                               style:
-                              TextStyle(color: Colors.grey, fontSize: 18),
+                                  TextStyle(color: Colors.grey, fontSize: 18),
                             ),
                           ),
                           Center(
@@ -572,7 +574,6 @@ class ReturnsPageState extends State<ReturnsPage> {
                                 if (textEditingController.text.isNotEmpty &&
                                     _selectedLocation.isNotEmpty) {
                                   authenticate(textEditingController.text);
-
                                 }
                               },
                               child: Container(
@@ -629,7 +630,6 @@ class ReturnsPageState extends State<ReturnsPage> {
       },
     );
   }
-
 
   searchRow() {
     return Container(
@@ -754,7 +754,7 @@ class ReturnsPageState extends State<ReturnsPage> {
           child: Column(
             children: [
               Container(
-                  height: 25,
+                  height: 45,
                   width: 500,
                   decoration: BoxDecoration(
                     color: const Color(0xff454d60),
@@ -843,7 +843,7 @@ class ReturnsPageState extends State<ReturnsPage> {
                 width: 500,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
-                  children: new List.generate(
+                  children: List.generate(
                     names.length,
                     (index) => Container(
                       height: 30,

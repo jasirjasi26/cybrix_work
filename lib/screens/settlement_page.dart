@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: avoid_single_cascade_in_expression_statements, unnecessary_new, prefer_const_constructors, sized_box_for_whitespace, prefer_const_literals_to_create_immutables, avoid_print
+
 import 'dart:convert';
 
 import 'package:api_cache_manager/models/cache_db_model.dart';
@@ -50,7 +52,6 @@ class SettlementPageState extends State<SettlementPage> {
   double totalReceived = 0;
 
   roundOff() {
-
     double total;
     setState(() {
       total = double.parse(subTotal.text);
@@ -80,30 +81,31 @@ class SettlementPageState extends State<SettlementPage> {
 
   addValues() async {
     String lastVoucher = voucherNo.text.replaceAll(User.voucherStarting, "");
-    double ch=double.parse(paidCash.text);
-    double cr=double.parse(paidCard.text);
+    double ch = double.parse(paidCash.text);
+    double cr = double.parse(paidCard.text);
+    print("paid via cash $cr");
+    print("paid via cash $ch");
 
     Map<String, String> values = {
-      'Balance': finalBalance.toStringAsFixed(User.decimals),
+      'Balance': finalBalance.toStringAsFixed(2),
       'Amount': subTotal.text.toString(),
-      'CardReceived': cr.toStringAsFixed(User.decimals),
-      'CashReceived': cr.toStringAsFixed(User.decimals),
+      'CardReceived': cr.toString(),
+      'CashReceived': ch.toString(),
       'OrderID': voucherNo.text.toString(),
-      'RoundOff': rounoff.toStringAsFixed(User.decimals),
+      'RoundOff': rounoff.toStringAsFixed(2),
       'TotalReceived': totalReceived.toString(),
       'UpdatedTime': DateTime.now().toString(),
       'VoucherDate': widget.date,
     };
 
-    Map<String, dynamic> finalData=widget.values;
+    Map<String, dynamic> finalData = widget.values;
     finalData.addEntries(values.entries);
-    var body=jsonEncode(finalData);
-
+    var body = jsonEncode(finalData);
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt("vouchernumber",int.parse(lastVoucher));
+    prefs.setInt("vouchernumber", int.parse(lastVoucher));
 
-    if (await DataConnectionChecker().hasConnection){
+    if (await DataConnectionChecker().hasConnection) {
       reference
         ..child("Bills")
             .child(widget.date)
@@ -122,52 +124,56 @@ class SettlementPageState extends State<SettlementPage> {
           backgroundColor: Colors.black,
           timeInSeconds: 2);
 
-      ///updating the voucher number
-
+      //   ///updating the voucher number
 
       reference
         ..child("Vouchers")
             .child(User.vanNo)
             .child("VoucherNumber")
             .remove()
-            .whenComplete(() => {
-          reference
-            ..child("Vouchers")
-                .child(User.vanNo)
-                .child("VoucherNumber")
-                .set(lastVoucher.toString())
-        });
+            .whenComplete(
+              () => {
+                reference
+                  ..child("Vouchers")
+                      .child(User.vanNo)
+                      .child("VoucherNumber")
+                      .set(lastVoucher.toString())
+              },
+            );
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return VanPage(
-          customerName: widget.customerName,
-          voucherNumber: voucherNo.text,
-          date: widget.date,
-          billAmount: finalData['BillAmount'],
-          customerCode:finalData['CustomerID'],
-          back: false,
-          values:finalData,
-          from: "Bills",
-        );
-      }));
-    }
-    else{
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) {
+            return VanPage(
+              customerName: widget.customerName,
+              voucherNumber: voucherNo.text,
+              date: widget.date,
+              billAmount: finalData['BillAmount'],
+              customerCode: finalData['CustomerID'],
+              back: false,
+              values: finalData,
+            );
+          },
+        ),
+      );
+    } else {
       APICacheDBModel cacheDBModel =
-      new APICacheDBModel(key: voucherNo.text, syncData: body);
+          new APICacheDBModel(key: voucherNo.text, syncData: body);
       await APICacheManager().addCacheData(cacheDBModel).then((value) => {
-        if(value){
-          saveToDb(finalData)
-        }
-      });
+            if (value) {saveToDb(finalData)}
+          });
     }
-
   }
 
   saveToDb(Map<String, dynamic> finalData) async {
-
-    ContactinfoModel contactinfoModel = ContactinfoModel(id: null,userId: voucherNo.text,createdAt: "Invoice",email: widget.date);
-    await Controller().addData(contactinfoModel).then((value){
-      if (value>0) {
+    ContactinfoModel contactinfoModel = ContactinfoModel(
+        id: null,
+        userId: voucherNo.text,
+        createdAt: "Invoice",
+        email: widget.date);
+    await Controller().addData(contactinfoModel).then((value) {
+      if (value > 0) {
         print("Success");
         EasyLoading.showSuccess('Successfully Saved');
         Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -176,36 +182,36 @@ class SettlementPageState extends State<SettlementPage> {
             voucherNumber: voucherNo.text,
             date: widget.date,
             billAmount: finalData['BillAmount'],
-            customerCode:finalData['CustomerID'],
-            values:finalData,
-            from: "Bills",
+            customerCode: finalData['CustomerID'],
+            values: finalData,
             back: false,
           );
         }));
-      }else{
+      } else {
         print("failed");
       }
     });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
-
     reference = FirebaseDatabase.instance
         .reference()
         .child("Companies")
         .child(User.database);
 
-    setState(() {
-      oldBalance.text = Customer.balance;
-      billAmount.text = widget.values['Amount'].toString();
-      subTotal.text = widget.values['Amount'].toString();
-      voucherNo.text=widget.values['OrderID'].toString();
-      paidCash.text = "0";
-      paidCard.text = "0";
-      finalBalance =
-          double.parse(Customer.balance) + double.parse(subTotal.text);
-    });
+    setState(
+      () {
+        oldBalance.text = Customer.balance;
+        billAmount.text = widget.values['Amount'].toString();
+        subTotal.text = widget.values['Amount'].toString();
+        voucherNo.text = widget.values['OrderID'].toString();
+        paidCash.text = "0";
+        paidCard.text = "0";
+        finalBalance =
+            double.parse(Customer.balance) + double.parse(subTotal.text);
+      },
+    );
 
     super.initState();
   }
@@ -262,16 +268,17 @@ class SettlementPageState extends State<SettlementPage> {
                       ],
                     ),
                     child: TextFormField(
-                        controller: voucherNo,
-                        decoration: InputDecoration(
-                          hintText: 'Voucher Number',
-                          //filled: true,
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(
-                              left: 15, bottom: 15, top: 15, right: 15),
-                          filled: false,
-                          isDense: false,
-                        )),
+                      controller: voucherNo,
+                      decoration: InputDecoration(
+                        hintText: 'Voucher Number',
+                        //filled: true,
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.only(
+                            left: 15, bottom: 15, top: 15, right: 15),
+                        filled: false,
+                        isDense: false,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -378,7 +385,7 @@ class SettlementPageState extends State<SettlementPage> {
                         //    color: Colors.black
                       )),
                   Text(
-                    "    Cash Received",
+                    "Cash Received",
                     style: TextStyle(fontSize: 18),
                   )
                 ],
@@ -714,7 +721,7 @@ class SettlementPageState extends State<SettlementPage> {
                         ),
                       ],
                     ),
-                    child: Center(child: Text(finalBalance.toString())),
+                    child: Center(child: Text(finalBalance.toStringAsFixed(2))),
                   ),
                 ],
               ),
@@ -726,6 +733,15 @@ class SettlementPageState extends State<SettlementPage> {
               child: GestureDetector(
                 onTap: () {
                   addValues();
+                  // if (paidCard.text.isNotEmpty || paidCash.text.isNotEmpty) {
+                  //   if (paidCard.text != "0" && paidCash.text == "0") {
+                  //     addValues();
+                  //   } else {
+                  //     if (paidCard.text == "0" && paidCash.text != "0") {
+                  //       addValues();
+                  //     }
+                  //   }
+                  // }
                 },
                 child: Container(
                   height: 50,
@@ -771,15 +787,15 @@ class SettlementPageState extends State<SettlementPage> {
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blue[900],
       centerTitle: true,
-      automaticallyImplyLeading: false,
+      automaticallyImplyLeading: true,
       title: Text(
         "Settlements",
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(color: Colors.white),
       ),
       iconTheme: IconThemeData(
-        color: Colors.black, //change your color here
+        color: Colors.white, //change your color here
       ),
       elevation: 0,
       titleSpacing: 0,

@@ -1,17 +1,17 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+
 import 'package:cybrix/data/user_data.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class StockReports1 extends StatefulWidget {
-
   @override
   StockReportsState1 createState() => StockReportsState1();
 }
 
 class StockReportsState1 extends State<StockReports1> {
-
   DatabaseReference reference;
   List<String> names = [];
   List<String> stock = [];
@@ -19,11 +19,9 @@ class StockReportsState1 extends State<StockReports1> {
   List<String> pRate = [];
   List<String> id = [];
 
-  var name=TextEditingController();
-
+  var name = TextEditingController();
 
   Future<void> getCustomerId(String date) async {
-
     setState(() {
       names.clear();
       stock.clear();
@@ -36,20 +34,24 @@ class StockReportsState1 extends State<StockReports1> {
       List<dynamic> values = snapshot.value;
       for (int i = 0; i < values.length; i++) {
         if (values[i] != null) {
-          if(values[i]['ItemName'].toString().toLowerCase().contains(name.text.toLowerCase())){
+          if (values[i]['ItemName']
+              .toString()
+              .toLowerCase()
+              .contains(name.text.toLowerCase())) {
             setState(() {
               String unit = values[i]["SaleUnit"].toString();
               names.add(values[i]['ItemName'].toString());
               sRate.add(values[i]["RateAndStock"][unit]["Rate"]);
               pRate.add(values[i]["RateAndStock"][unit]["PurchaseRate"]);
               id.add(values[i]['ItemID'].toString());
-              stock.add(values[i]["RateAndStock"][unit]["Stock"][int.parse(User.vanNo)].toString());
+              stock.add(values[i]["RateAndStock"][unit]["Stock"]
+                      [int.parse(User.vanNo)]
+                  .toString());
             });
           }
         }
       }
     });
-
   }
 
   void initState() {
@@ -62,7 +64,6 @@ class StockReportsState1 extends State<StockReports1> {
 
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +84,7 @@ class StockReportsState1 extends State<StockReports1> {
 
   searchRow() {
     return Container(
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       height: 80,
       child: Column(
         children: [
@@ -95,10 +93,7 @@ class StockReportsState1 extends State<StockReports1> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Container(
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * 0.93,
+                  width: MediaQuery.of(context).size.width * 0.93,
                   height: 50,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5.0),
@@ -218,67 +213,45 @@ class StockReportsState1 extends State<StockReports1> {
                         textAlign: TextAlign.left,
                       ),
                     ),
-
                   ],
                 ),
               ),
               Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.7,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-
-                child: new ListView(
-                  children: new List.generate(names.length, (index) =>
-                      Container(
-                        height: 30,
-                        width: MediaQuery
-                            .of(context)
-                            .size
-                            .width,
-                        decoration: BoxDecoration(
-                          color: index.floor().isEven ? Color(0x66d6d6d6) : Color(0x66f3ceef),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Padding(
+                height: MediaQuery.of(context).size.height * 0.7,
+                width: MediaQuery.of(context).size.width,
+                child: ListView(
+                  children: List.generate(
+                    names.length,
+                    (index) => Container(
+                      height: 30,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: index.floor().isEven
+                            ? Color(0x66d6d6d6)
+                            : Color(0x66f3ceef),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              id[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                          Container(
+                            width: 200,
+                            child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                id[index],
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 12,
-                                  color:  Colors.black,
-                                ),
-                                textAlign: TextAlign.left,
-                              ),
-                            ),
-                            Container(
-                              width: 200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  names[index],
-                                  style: TextStyle(
-                                    fontFamily: 'Arial',
-                                    fontSize: 12,
-                                    color:  Colors.black,
-                                  ),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                            ),
-                            SizedBox(),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                stock[index],
+                                names[index],
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 12,
@@ -287,33 +260,48 @@ class StockReportsState1 extends State<StockReports1> {
                                 textAlign: TextAlign.left,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                sRate[index],
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.left,
+                          ),
+                          SizedBox(),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              stock[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
                               ),
+                              textAlign: TextAlign.left,
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                pRate[index],
-                                style: TextStyle(
-                                  fontFamily: 'Arial',
-                                  fontSize: 12,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.left,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              sRate[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
                               ),
+                              textAlign: TextAlign.left,
                             ),
-                          ],
-                        ),
-                      ),),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              pRate[index],
+                              style: TextStyle(
+                                fontFamily: 'Arial',
+                                fontSize: 12,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.left,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, avoid_print, unused_import, prefer_typing_uninitialized_variables, prefer_is_empty
+
 import 'dart:convert';
 
 import 'package:api_cache_manager/models/cache_db_model.dart';
@@ -29,26 +31,26 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   DatabaseReference reference;
   DatabaseReference items;
+
   String today = DateTime.now().year.toString() +
       "-" +
       DateTime.now().month.toString() +
       "-" +
       DateTime.now().day.toString();
   int todaysPending = 0;
-  int todaysOrders = 0;
+  int todaysSales = 0;
   double totalSales = 0;
   double totalStocks = 0;
   DatabaseReference names;
-  List<String> _locations = []; // Opt
+  final List<String> _locations = []; // Opt
   DatabaseReference types; // Opt
   List<double> data = [];
   String selected = "day";
 
   getDetails() async {
-    String db=User.database;
+    String db = User.database;
     String url =
-         "https://cybrixproject1-default-rtdb.firebaseio.com/Companies/$db/DefaultSettings/Decimal.json";
-
+        "https://cybrixproject1-default-rtdb.firebaseio.com/Companies/$db/DefaultSettings/Decimal.json";
 
     final response = await http.get(
       url,
@@ -58,14 +60,14 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
     if (response.statusCode == 200) {
-      var json=jsonDecode(response.body);
+      var json = jsonDecode(response.body);
+      print(json);
       setState(() {
-        User.decimals= int.parse(json['Sales']);
+        User.decimals = int.parse(json['Sales']);
       });
       final prefs = await SharedPreferences.getInstance();
-      prefs.setInt("decimal",User.decimals);
+      prefs.setInt("decimal", User.decimals);
 
-      print(User.decimals);
     } else {
       print("Failed");
     }
@@ -89,10 +91,9 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         });
       });
-
     } else if (selected == "week") {
       for (int i = 0; i < 7; i++) {
-        DateTime a = DateTime.now().subtract(new Duration(days: i));
+        DateTime a = DateTime.now().subtract(Duration(days: i));
         String c = a.year.toString() +
             "-" +
             a.month.toString() +
@@ -119,9 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
           data.add(value);
         });
       }
-    }
-
-    else if (selected == "month") {
+    } else if (selected == "month") {
       for (int i = 0; i < 30; i++) {
         DateTime a = DateTime.now().subtract(new Duration(days: i));
         String c = a.year.toString() +
@@ -162,15 +161,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-
-
-
   Future<void> getOrders() async {
     setState(() {
       totalSales = 0;
       todaysPending = 0;
       totalStocks = 0;
-      todaysOrders = 0;
+      todaysSales = 0;
     });
 
     await reference.child("Stocks").once().then((DataSnapshot snapshot) {
@@ -213,12 +209,14 @@ class _MyHomePageState extends State<MyHomePage> {
       if (values != null) {
         if (values.length > 0) {
           setState(() {
-            todaysOrders = values.length + todaysPending;
+            todaysSales = values.length;
+            print("todaysSales ${(todaysSales)}");
+            // + todaysPending;
           });
         }
       } else {
         setState(() {
-          todaysOrders = todaysPending;
+          todaysSales = todaysPending;
         });
       }
     });
@@ -229,17 +227,19 @@ class _MyHomePageState extends State<MyHomePage> {
         .once()
         .then((DataSnapshot snapshot) {
       Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key, values) {
-        setState(() {
-          totalSales = totalSales + double.parse(values["GrandAmount"]);
+      if(values!=null){
+        values.forEach((key, values) {
+          setState(() {
+            totalSales = totalSales + double.parse(values["GrandAmount"]);
+          });
         });
-      });
-    });
+      }
 
+    });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
     getDetails();
     reference = FirebaseDatabase.instance
         .reference()
@@ -264,10 +264,10 @@ class _MyHomePageState extends State<MyHomePage> {
         .child("Items");
 
     GetVouchers().getVouchers();
-    getChart("day");
+    //getChart("day");
     getOrders();
     getSalesTypes();
-    Refresh().refresh();
+    Refresh.refresh();
     super.initState();
   }
 
@@ -295,9 +295,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 20,
               ),
               diffBox(),
-              SizedBox(
-                height: 20,
-              ),
+              // SizedBox(
+              //   height: 20,
+              // ),
               overViewBox()
             ],
           ),
@@ -377,7 +377,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                totalSales.toStringAsFixed(User.decimals),
+                                totalSales.toStringAsFixed(2),
                                 style: TextStyle(
                                   fontFamily: 'Segoe UI',
                                   fontSize: 22,
@@ -695,7 +695,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                todaysOrders.toString(),
+                                todaysSales.toString(),
                                 style: TextStyle(
                                   fontFamily: 'Segoe UI',
                                   fontSize: 22,
@@ -708,7 +708,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 8.0),
                               child: Text(
-                                'Todays Order',
+                                'Todays Sales',
                                 style: TextStyle(
                                   fontFamily: 'Arial',
                                   fontSize: 15,
@@ -746,163 +746,163 @@ class _MyHomePageState extends State<MyHomePage> {
   diffBox() {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selected = "day";
-                  });
-                  getChart(selected);
-                },
-                child: Container(
-                    width: 80,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: selected == "day"
-                          ? Colors.blue[900]
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                        child: Text(
-                      "Day",
-                      style: TextStyle(
-                          color: selected == "day" ? Colors.white : Colors.grey,
-                          fontWeight: FontWeight.w900),
-                    ))),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selected = "week";
-                  });
-                  getChart(selected);
-                },
-                child: Container(
-                    width: 80,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: selected == "week"
-                          ? Colors.blue[900]
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                        child: Text(
-                      "Week",
-                      style: TextStyle(
-                          color:
-                              selected == "week" ? Colors.white : Colors.grey,
-                          fontWeight: FontWeight.w900),
-                    ))),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selected = "month";
-                  });
-                  getChart(selected);
-                },
-                child: Container(
-                    width: 80,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: selected == "month"
-                          ? Colors.blue[900]
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                        child: Text(
-                      "Month",
-                      style: TextStyle(
-                          color:
-                              selected == "month" ? Colors.white : Colors.grey,
-                          fontWeight: FontWeight.w900),
-                    ))),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selected = "year";
-                  });
-                  getChart(selected);
-                },
-                child: Container(
-                    width: 80,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: selected == "year"
-                          ? Colors.blue[900]
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    child: Center(
-                        child: Text(
-                      "Year",
-                      style: TextStyle(
-                          color:
-                              selected == "year" ? Colors.white : Colors.grey,
-                          fontWeight: FontWeight.w900),
-                    ))),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-            height: 200,
-            width: MediaQuery.of(context).size.width * 0.9,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              // image: DecorationImage(
-              //   image: AssetImage('assets/images/chart.png'),
-              //   fit: BoxFit.cover,
-              // ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0x29000000),
-                  offset: Offset(6, 3),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: data.length > 0
-                  ? SfSparkLineChart(
-                      color: Colors.blueGrey,
-                      width: 5,
-                      axisLineColor: Colors.white,
-                      //Enable the trackball
-                      trackball: SparkChartTrackball(
-                          activationMode: SparkChartActivationMode.tap),
-                      //Enable marker
-                      marker: SparkChartMarker(
-                          displayMode: SparkChartMarkerDisplayMode.all),
-                      //Enable data label
-                      labelDisplayMode: SparkChartLabelDisplayMode.all,
-                      data: data)
-                  : Center(
-                      child: Text("No data..."),
-                    ),
-            ))
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //   children: [
+        //     Padding(
+        //       padding: const EdgeInsets.all(0.0),
+        //       child: GestureDetector(
+        //         onTap: () {
+        //           setState(() {
+        //             selected = "day";
+        //           });
+        //           getChart(selected);
+        //         },
+        //         child: Container(
+        //             width: 80,
+        //             height: 25,
+        //             decoration: BoxDecoration(
+        //               color: selected == "day"
+        //                   ? Colors.blue[900]
+        //                   : Colors.transparent,
+        //               borderRadius: BorderRadius.circular(10.0),
+        //             ),
+        //             child: Center(
+        //                 child: Text(
+        //               "Day",
+        //               style: TextStyle(
+        //                   color: selected == "day" ? Colors.white : Colors.grey,
+        //                   fontWeight: FontWeight.w900),
+        //             ))),
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.all(0.0),
+        //       child: GestureDetector(
+        //         onTap: () {
+        //           setState(() {
+        //             selected = "week";
+        //           });
+        //           getChart(selected);
+        //         },
+        //         child: Container(
+        //             width: 80,
+        //             height: 25,
+        //             decoration: BoxDecoration(
+        //               color: selected == "week"
+        //                   ? Colors.blue[900]
+        //                   : Colors.transparent,
+        //               borderRadius: BorderRadius.circular(10.0),
+        //             ),
+        //             child: Center(
+        //                 child: Text(
+        //               "Week",
+        //               style: TextStyle(
+        //                   color:
+        //                       selected == "week" ? Colors.white : Colors.grey,
+        //                   fontWeight: FontWeight.w900),
+        //             ))),
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.all(0.0),
+        //       child: GestureDetector(
+        //         onTap: () {
+        //           setState(() {
+        //             selected = "month";
+        //           });
+        //           getChart(selected);
+        //         },
+        //         child: Container(
+        //             width: 80,
+        //             height: 25,
+        //             decoration: BoxDecoration(
+        //               color: selected == "month"
+        //                   ? Colors.blue[900]
+        //                   : Colors.transparent,
+        //               borderRadius: BorderRadius.circular(10.0),
+        //             ),
+        //             child: Center(
+        //                 child: Text(
+        //               "Month",
+        //               style: TextStyle(
+        //                   color:
+        //                       selected == "month" ? Colors.white : Colors.grey,
+        //                   fontWeight: FontWeight.w900),
+        //             ))),
+        //       ),
+        //     ),
+        //     Padding(
+        //       padding: const EdgeInsets.all(0.0),
+        //       child: GestureDetector(
+        //         onTap: () {
+        //           setState(() {
+        //             selected = "year";
+        //           });
+        //           getChart(selected);
+        //         },
+        //         child: Container(
+        //             width: 80,
+        //             height: 25,
+        //             decoration: BoxDecoration(
+        //               color: selected == "year"
+        //                   ? Colors.blue[900]
+        //                   : Colors.transparent,
+        //               borderRadius: BorderRadius.circular(10.0),
+        //             ),
+        //             child: Center(
+        //                 child: Text(
+        //               "Year",
+        //               style: TextStyle(
+        //                   color:
+        //                       selected == "year" ? Colors.white : Colors.grey,
+        //                   fontWeight: FontWeight.w900),
+        //             ))),
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        // SizedBox(
+        //   height: 10,
+        // ),
+        // Container(
+        //     height: 200,
+        //     width: MediaQuery.of(context).size.width * 0.9,
+        //     decoration: BoxDecoration(
+        //       color: Colors.white,
+        //       borderRadius: BorderRadius.circular(10.0),
+        //       // image: DecorationImage(
+        //       //   image: AssetImage('assets/images/chart.png'),
+        //       //   fit: BoxFit.cover,
+        //       // ),
+        //       boxShadow: [
+        //         BoxShadow(
+        //           color: const Color(0x29000000),
+        //           offset: Offset(6, 3),
+        //           blurRadius: 6,
+        //         ),
+        //       ],
+        //     ),
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(8.0),
+        //       child: data.length > 0
+        //           ? SfSparkLineChart(
+        //               color: Colors.blueGrey,
+        //               width: 5,
+        //               axisLineColor: Colors.white,
+        //               //Enable the trackball
+        //               trackball: SparkChartTrackball(
+        //                   activationMode: SparkChartActivationMode.tap),
+        //               //Enable marker
+        //               marker: SparkChartMarker(
+        //                   displayMode: SparkChartMarkerDisplayMode.all),
+        //               //Enable data label
+        //               labelDisplayMode: SparkChartLabelDisplayMode.all,
+        //               data: data)
+        //           : Center(
+        //               child: Text("No data..."),
+        //             ),
+        //     ))
       ],
     );
   }
@@ -1131,6 +1131,7 @@ class _MyHomePageState extends State<MyHomePage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20.0),
+              // ignore: prefer_const_literals_to_create_immutables
               boxShadow: [
                 BoxShadow(
                   color: const Color(0x29000000),
@@ -1153,6 +1154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(15.0),
                           color: Color(0xfff5ddbb),
+                          // ignore: prefer_const_literals_to_create_immutables
                           boxShadow: [
                             BoxShadow(
                               color: const Color(0x29000000),
@@ -1180,6 +1182,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0, top: 5),
                   child: Row(
+                    // ignore: prefer_const_literals_to_create_immutables
                     children: [
                       Text(
                         "Tap to view",
@@ -1225,21 +1228,26 @@ class _MyHomePageState extends State<MyHomePage> {
       centerTitle: false,
       actions: [
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-          child: Container(
-            height: 20,
-            width: 40,
-            child: Image.asset(
-              'assets/images/person.png',
-              fit: BoxFit.fill,
-            ),
+          padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+          child: Column(
+            children: [
+              Container(
+                height: 50,
+                width: 50,
+                child: Image.asset(
+                  'assets/images/person.png',
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Center(
+                  child: Text(
+                    User.name.toString(),
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+                  )),
+            ],
           ),
         ),
-        Center(
-            child: Text(
-          User.name.toString(),
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
-        )),
+
         SizedBox(
           width: 15,
         ),
@@ -1267,7 +1275,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       elevation: 1.0,
       titleSpacing: 0,
-      toolbarHeight: 70,
+      toolbarHeight: 80,
     );
   }
 }

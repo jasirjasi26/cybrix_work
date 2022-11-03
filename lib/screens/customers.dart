@@ -50,7 +50,7 @@ class CustomersListState extends State<CustomersList> {
           setState(() {
             names.add(values["Name"].toString());
             balance.add(
-                double.parse(values["Balance"]).toStringAsFixed(User.decimals).toString());
+                double.parse(values["Balance"]).toStringAsFixed(2).toString());
             id.add(values["CustomerCode"].toString());
           });
         }

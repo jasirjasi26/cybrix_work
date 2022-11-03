@@ -57,10 +57,14 @@ dependencies:
   connectivity:
   data_connection_checker:
   flutter_easyloading:
+  cached_network_image: ^2.5.0
+  syncfusion_flutter_pdfviewer: ^18.4.49-beta
+  flutter_html_to_pdf: ^0.5.2
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  qr_flutter:
 
 dev_dependencies:
   flutter_test:

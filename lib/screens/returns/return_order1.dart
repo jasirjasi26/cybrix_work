@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors_in_immutables, unused_import, curly_braces_in_flow_control_structures, prefer_const_constructors
+
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -17,7 +19,6 @@ import 'package:api_cache_manager/models/cache_db_model.dart';
 import 'package:api_cache_manager/utils/cache_manager.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_flexible_toast/flutter_flexible_toast.dart';
 import 'package:path_provider/path_provider.dart';
@@ -29,8 +30,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'dart:io';
-
 import '../van_page.dart';
 import 'bill.dart';
 
@@ -105,9 +104,8 @@ class NewOrderPageState extends State<SalesReturn> {
   String ID = "";
   List<dynamic> itemData;
 
-
   DateTime selectedDate = DateTime.now();
-  String from =DateTime.now().year.toString() +
+  String from = DateTime.now().year.toString() +
       "-" +
       DateTime.now().month.toString() +
       "-" +
@@ -135,15 +133,13 @@ class NewOrderPageState extends State<SalesReturn> {
       });
   }
 
-
-
   add() async {
     if (await DataConnectionChecker().hasConnection) {
       await items.once().then((DataSnapshot snapshot) async {
         List<dynamic> values = snapshot.value;
 
         APICacheDBModel cacheDBModel =
-        new APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
+            APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
         await APICacheManager().addCacheData(cacheDBModel);
       });
 
@@ -157,15 +153,13 @@ class NewOrderPageState extends State<SalesReturn> {
   }
 
   refresh() async {
-
     await items.once().then((DataSnapshot snapshot) async {
       List<dynamic> values = snapshot.value;
 
       APICacheDBModel cacheDBModel =
-      new APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
+          APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
       await APICacheManager().addCacheData(cacheDBModel);
     });
-
   }
 
   takeUnit(String cunit) async {
@@ -174,14 +168,14 @@ class NewOrderPageState extends State<SalesReturn> {
         List<dynamic> values = snapshot.value;
 
         APICacheDBModel cacheDBModel =
-        new APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
+            APICacheDBModel(key: "itemData", syncData: jsonEncode(values));
         await APICacheManager().addCacheData(cacheDBModel);
 
         int d = int.parse(User.vanNo);
         setState(() {
           rate = values[int.parse(itemId)]["RateAndStock"][cunit]["Rate"];
           stock = values[int.parse(itemId)]["RateAndStock"][cunit]["Stock"][d];
-          rate = double.parse(rate).toStringAsFixed(User.decimals).toString();
+          rate = double.parse(rate).toStringAsFixed(2).toString();
           saleRate.text = rate;
         });
       });
@@ -193,7 +187,7 @@ class NewOrderPageState extends State<SalesReturn> {
       setState(() {
         rate = values[int.parse(itemId)]["RateAndStock"][cunit]["Rate"];
         stock = values[int.parse(itemId)]["RateAndStock"][cunit]["Stock"][d];
-        rate = double.parse(rate).toStringAsFixed(User.decimals).toString();
+        rate = double.parse(rate).toStringAsFixed(2).toString();
         saleRate.text = rate;
       });
     }
@@ -220,8 +214,8 @@ class NewOrderPageState extends State<SalesReturn> {
       itemIds.add(id);
       units.add(unit);
       totalamount.add(total);
-      allDiscounts.add(discount.toStringAsFixed(User.decimals));
-      discountAmount.add(double.parse(discount.toStringAsFixed(User.decimals)));
+      allDiscounts.add(discount.toStringAsFixed(2));
+      discountAmount.add(double.parse(discount.toStringAsFixed(2)));
       discountedFinalRate.add(discountedAmount);
       quantity.add(qty);
       totalBill = totalBill + double.parse(total);
@@ -287,7 +281,7 @@ class NewOrderPageState extends State<SalesReturn> {
       discountedBill = totalBill - double.parse(byPrice.text);
       double a = (totalBill - discountedBill) / (totalBill) * 100;
       double b = (a);
-      byPercentage.text = b.toStringAsFixed(User.decimals);
+      byPercentage.text = b.toStringAsFixed(2);
     });
   }
 
@@ -299,7 +293,7 @@ class NewOrderPageState extends State<SalesReturn> {
       discountedBill =
           totalBill - totalBill / 100 * double.parse(byPercentage.text);
       double d = totalBill - discountedBill;
-      byPrice.text = d.toStringAsFixed(User.decimals);
+      byPrice.text = d.toStringAsFixed(2);
     });
   }
 
@@ -307,12 +301,12 @@ class NewOrderPageState extends State<SalesReturn> {
     GetVouchers().getVouchers();
     GetCustomerDetails().getCustomerId(widget.customerName);
 
-    print(Customer.CustomerName+Customer.CustomerId);
+    print(Customer.CustomerName + Customer.CustomerId);
   }
 
   Future<void> addtoInvoiceValues() async {
     double d = (totalBill - discountedBill) + disc;
-    double am=discountedBill-disc;
+    double am = discountedBill - disc;
     List amm = [];
 
     for (int i = 0; i < itemname.length; i++) {
@@ -338,29 +332,29 @@ class NewOrderPageState extends State<SalesReturn> {
       amm.add(itemValues);
     }
 
-    double b=double.parse(Customer.balance)+totalBill;
+    double b = double.parse(Customer.balance) + totalBill;
     Map<String, dynamic> values = {
-      'Amount': am.toStringAsFixed(User.decimals),
+      'Amount': am.toStringAsFixed(2),
       'ArabicName': "",
-      'CashReceived':"0",
-      'CardReceived':"0",
-      'RoundOff':"0",
-      'Balance': b.toStringAsFixed(User.decimals),
-      'BillAmount': totalBill.toStringAsFixed(User.decimals),
+      'CashReceived': "0",
+      'CardReceived': "0",
+      'RoundOff': "0",
+      'Balance': b.toStringAsFixed(2),
+      'BillAmount': totalBill.toStringAsFixed(2),
       'TotalDiscount': "0",
       'CustomerID': Customer.CustomerId,
       'CustomerName': Customer.CustomerName,
       'OldBalance': Customer.balance,
       'OrderID': User.returnNumber,
-      'Items':amm.toList(),
+      'Items': amm.toList(),
       'Qty': quantity.reduce((a, b) => a + b).toString(),
       'RefNo': "",
       'SalesType': widget.salesType,
       'SettledBy': User.number,
-      'TaxAmount': taxTotal.reduce((a, b) => a + b).toStringAsFixed(User.decimals),
+      'TaxAmount': taxTotal.reduce((a, b) => a + b).toStringAsFixed(2),
       'TotalCESS': "0",
       'TotalGST': "0",
-      'TotalVAT': taxTotal.reduce((a, b) => a + b).toStringAsFixed(User.decimals),
+      'TotalVAT': taxTotal.reduce((a, b) => a + b).toStringAsFixed(2),
       'UpdatedBy': User.number,
       'UpdatedTime': DateTime.now().toString(),
       'VoucherDate': today,
@@ -368,14 +362,12 @@ class NewOrderPageState extends State<SalesReturn> {
 
     ///updating the voucher number
 
-    String lastVoucher = User.returnNumber.replaceAll(User.returnStarting, "");
-
+    var lastVoucher = User.returnNumber.replaceAll(User.returnStarting, "");
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt("returnnumber",int.parse(lastVoucher));
+    prefs.setInt("returnnumber", int.parse(lastVoucher));
 
-
-    if (await DataConnectionChecker().hasConnection){
+    if (await DataConnectionChecker().hasConnection) {
       reference
           .child("Returns")
           .child(today)
@@ -388,12 +380,12 @@ class NewOrderPageState extends State<SalesReturn> {
             .child("ReturnNumber")
             .remove()
             .whenComplete(() => {
-          reference
-            ..child("Vouchers")
-                .child(User.vanNo)
-                .child("ReturnNumber")
-                .set(lastVoucher.toString())
-        });
+                  reference
+                    ..child("Vouchers")
+                        .child(User.vanNo)
+                        .child("ReturnNumber")
+                        .set(lastVoucher.toString())
+                });
 
       FlutterFlexibleToast.showToast(
           message: "Added to Returns",
@@ -411,25 +403,27 @@ class NewOrderPageState extends State<SalesReturn> {
           customerName: widget.customerName,
           voucherNumber: User.returnNumber,
           date: today,
-          from:"Returns",
-          billAmount:values['BillAmount'],
+          values: values,
+          billAmount: values['BillAmount'],
           customerCode: values['CustomerID'],
           back: false,
         );
       }));
-    }else{
-      saveToDb(values);
+    } else {
+      var body = jsonEncode(values);
+      APICacheDBModel cacheDBModel =
+      APICacheDBModel(key: values['OrderID'], syncData: body);
+      await APICacheManager().addCacheData(cacheDBModel).then((value) => {
+        if (value) {saveToDb(values)}
+      });
     }
-
-
   }
 
   saveToDb(Map<String, dynamic> finalData) async {
-
-    ContactinfoModel contactinfoModel = ContactinfoModel(id: null,userId: User.returnNumber,createdAt: "Return",email: today);
-    await Controller().addData(contactinfoModel).then((value){
-      if (value>0) {
-        print("Success");
+    ContactinfoModel contactinfoModel = ContactinfoModel(
+        id: null, userId:finalData['OrderID'].toString(), createdAt: "Return", email: today);
+    await Controller().addData(contactinfoModel).then((value) {
+      if (value > 0) {
         EasyLoading.showSuccess('Successfully Saved');
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return VanPage(
@@ -437,18 +431,16 @@ class NewOrderPageState extends State<SalesReturn> {
             voucherNumber: User.returnNumber,
             date: today,
             billAmount: finalData['BillAmount'],
-            customerCode:finalData['CustomerID'],
+            customerCode: finalData['CustomerID'],
             values: finalData,
             back: false,
           );
         }));
-      }else{
+      } else {
         print("failed");
       }
     });
   }
-
-
 
   void initState() {
     // TODO: implement initState
@@ -638,7 +630,7 @@ class NewOrderPageState extends State<SalesReturn> {
               itemBuilder: (context, i) {
                 return Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child:  GestureDetector(
+                  child: GestureDetector(
                     onLongPress: () {
                       editItem(i, quantity[i]);
                     },
@@ -908,8 +900,8 @@ class NewOrderPageState extends State<SalesReturn> {
                       ],
                     ),
                     child: Center(
-                        child: Text((discountedBill - disc)
-                            .toStringAsFixed(User.decimals))),
+                        child:
+                            Text((discountedBill - disc).toStringAsFixed(2))),
                   ),
                 ],
               ),
@@ -1234,8 +1226,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                       if (itemData[index] != null) {
                                         String z = itemData[index]['SaleUnit'];
                                         if (itemData[index]['ItemName']
-                                            .toLowerCase()
-                                            .contains(as) ||
+                                                .toLowerCase()
+                                                .contains(as) ||
                                             itemData[index]['ItemID']
                                                 .toLowerCase()
                                                 .contains(as)) {
@@ -1245,81 +1237,81 @@ class NewOrderPageState extends State<SalesReturn> {
                                               children: [
                                                 Container(
                                                   width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
+                                                          .size
+                                                          .width -
                                                       60,
                                                   child: ListTile(
                                                       trailing: Text("ID : " +
                                                           itemData[index]
-                                                          ['ItemID']),
+                                                              ['ItemID']),
                                                       onTap: () {
                                                         setState(() {
                                                           Name = itemData[index]
-                                                          ["ItemName"]
+                                                                  ["ItemName"]
                                                               .toString();
                                                           ID = itemData[index]
-                                                          ["ItemID"]
+                                                                  ["ItemID"]
                                                               .toString();
 
                                                           textEditingController
                                                               .text = itemData[
-                                                          index]
-                                                          ["ItemName"]
+                                                                      index]
+                                                                  ["ItemName"]
                                                               .toString();
                                                           itemId =
                                                               itemData[index]
-                                                              ["ItemID"]
+                                                                      ["ItemID"]
                                                                   .toString();
                                                           unit = itemData[index]
-                                                          ["SaleUnit"]
+                                                                  ["SaleUnit"]
                                                               .toString();
                                                           rate = itemData[index]
-                                                          [
-                                                          "RateAndStock"]
-                                                          [z]["Rate"];
+                                                                  [
+                                                                  "RateAndStock"]
+                                                              [z]["Rate"];
                                                           rate = double.parse(
-                                                              rate)
+                                                                  rate)
                                                               .toStringAsFixed(
-                                                              User.decimals)
+                                                                  User.decimals)
                                                               .toString();
                                                           totalStock = itemData[
-                                                          index]
-                                                          ["TotalStock"]
+                                                                      index]
+                                                                  ["TotalStock"]
                                                               .toString();
 
                                                           code = itemData[index]
-                                                          ["Code"]
+                                                                  ["Code"]
                                                               .toString();
                                                           if (itemData[index][
-                                                          "VATInclusive"]
-                                                              .toString() ==
+                                                                      "VATInclusive"]
+                                                                  .toString() ==
                                                               "Disabled") {
                                                             vat = double.parse(
                                                                 itemData[index]
-                                                                ["VAT"]
+                                                                        ["VAT"]
                                                                     .toString());
                                                           }
                                                           saleRate.text = rate;
                                                           if (saleQty.text
-                                                              .toString() ==
+                                                                  .toString() ==
                                                               "0") {
                                                             totalAmount =
                                                                 double.parse(
-                                                                    rate) *
+                                                                        rate) *
                                                                     1;
                                                             lastSaleRate =
-                                                                totalAmount.toString();
-
-
+                                                                totalAmount
+                                                                    .toString();
                                                           } else {
                                                             totalAmount = double
-                                                                .parse(
-                                                                rate) *
+                                                                    .parse(
+                                                                        rate) *
                                                                 double.parse(
                                                                     saleQty
                                                                         .text);
                                                             lastSaleRate =
-                                                                totalAmount.toString();
+                                                                totalAmount
+                                                                    .toString();
                                                           }
                                                           unitController.text =
                                                               unit;
@@ -1327,60 +1319,60 @@ class NewOrderPageState extends State<SalesReturn> {
                                                               totalStock;
 
                                                           stock = itemData[index]
-                                                          [
-                                                          "RateAndStock"]
-                                                          [
-                                                          z]["Stock"]
-                                                          [
-                                                          int.parse(User
-                                                              .vanNo)]
+                                                                          [
+                                                                          "RateAndStock"]
+                                                                      [
+                                                                      z]["Stock"]
+                                                                  [
+                                                                  int.parse(User
+                                                                      .vanNo)]
                                                               .toString();
                                                         });
 
                                                         unitlist.clear();
                                                         Map<dynamic, dynamic>
-                                                        values =
-                                                        itemData[index][
-                                                        'RateAndStock'];
+                                                            values =
+                                                            itemData[index][
+                                                                'RateAndStock'];
                                                         values.forEach(
-                                                                (key, value) {
-                                                              setState(() {
-                                                                unitlist.add(
-                                                                    key.toString());
-                                                              });
-                                                            });
+                                                            (key, value) {
+                                                          setState(() {
+                                                            unitlist.add(
+                                                                key.toString());
+                                                          });
+                                                        });
                                                         Navigator.pop(context);
 
                                                         showBookingDialog();
                                                       },
                                                       title: Text(
                                                         itemData[index]
-                                                        ['ItemName'],
+                                                            ['ItemName'],
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           fontSize: 13,
                                                           color: Colors.white,
                                                           fontWeight:
-                                                          FontWeight.w700,
+                                                              FontWeight.w700,
                                                         ),
                                                         textAlign:
-                                                        TextAlign.left,
+                                                            TextAlign.left,
                                                       ),
                                                       subtitle: Text(
                                                         "Price : " +
                                                             itemData[index][
-                                                            'RateAndStock']
-                                                            [z]['Rate']
+                                                                        'RateAndStock']
+                                                                    [z]['Rate']
                                                                 .toString(),
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           fontSize: 10,
                                                           color: Colors.white,
                                                           fontWeight:
-                                                          FontWeight.w700,
+                                                              FontWeight.w700,
                                                         ),
                                                         textAlign:
-                                                        TextAlign.left,
+                                                            TextAlign.left,
                                                       ),
                                                       leading: Container(
                                                         height: 50,
@@ -1389,14 +1381,14 @@ class NewOrderPageState extends State<SalesReturn> {
                                                         child: Center(
                                                           child: Text(
                                                             itemData[index]
-                                                            ['ItemName']
+                                                                    ['ItemName']
                                                                 .toString()
                                                                 .substring(0, 1)
                                                                 .toUpperCase(),
                                                             style: TextStyle(
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                                 fontSize: 20),
                                                           ),
                                                         ),
@@ -1425,7 +1417,7 @@ class NewOrderPageState extends State<SalesReturn> {
         transitionBuilder: (_, anim, __, child) {
           return SlideTransition(
             position:
-            Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+                Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
             child: child,
           );
         },
@@ -1436,56 +1428,51 @@ class NewOrderPageState extends State<SalesReturn> {
       saleQty.text = "1";
     });
 
-    bool scan=false;
+    bool scan = false;
 
     void calculteAmount(String a) {
       if (vat > 0) {
         setState(() {
           totalAmount = double.parse(saleQty.text) * double.parse(rate);
           double t = totalAmount * (vat / 100);
-          tax = double.parse(t.toStringAsFixed(User.decimals));
+          tax = double.parse(t.toStringAsFixed(2));
           totalAmount = totalAmount + tax;
-          lastSaleRate =
-              totalAmount.toStringAsFixed(User.decimals);
+          lastSaleRate = totalAmount.toStringAsFixed(2);
         });
       } else {
-        if(saleQty.text!=""&&rate!=""){
+        if (saleQty.text != "" && rate != "") {
           setState(() {
             totalAmount = double.parse(saleQty.text) * double.parse(rate);
-            lastSaleRate =totalAmount.toStringAsFixed(User.decimals);
+            lastSaleRate = totalAmount.toStringAsFixed(2);
           });
         }
-
       }
     }
 
     void disPri(String a) {
       setState(() {
-        lastSaleRate = totalAmount.toStringAsFixed(User.decimals);
+        lastSaleRate = totalAmount.toStringAsFixed(2);
       });
       setState(() {
-        var a=  totalAmount - double.parse(byPri.text);
-        lastSaleRate =
-            a.toStringAsFixed(User.decimals);
-        double b= (totalAmount - double.parse(lastSaleRate)) / (totalAmount) * 100;
-        byPer.text = b.toStringAsFixed(User.decimals);
+        var a = totalAmount - double.parse(byPri.text);
+        lastSaleRate = a.toStringAsFixed(2);
+        double b =
+            (totalAmount - double.parse(lastSaleRate)) / (totalAmount) * 100;
+        byPer.text = b.toStringAsFixed(2);
       });
     }
 
     void disPer(String a) {
       setState(() {
-        lastSaleRate = totalAmount.toStringAsFixed(User.decimals);
+        lastSaleRate = totalAmount.toStringAsFixed(2);
       });
       setState(() {
-        var a =
-            totalAmount - totalAmount / 100 * double.parse(byPer.text);
-        lastSaleRate = a.toStringAsFixed(User.decimals);
+        var a = totalAmount - totalAmount / 100 * double.parse(byPer.text);
+        lastSaleRate = a.toStringAsFixed(2);
         double val = totalAmount - double.parse(lastSaleRate);
-        byPri.text = val.toStringAsFixed(User.decimals);
+        byPri.text = val.toStringAsFixed(2);
       });
     }
-
-
 
     void _onQRViewCreated(QRViewController controller) {
       setState(() {
@@ -1494,8 +1481,8 @@ class NewOrderPageState extends State<SalesReturn> {
       controller.scannedDataStream.listen((scanData) {
         setState(() {
           result = scanData;
-          ns.text=result.code;
-          as=result.code;
+          ns.text = result.code;
+          as = result.code;
         });
         this.controller.stopCamera();
         Navigator.pop(context);
@@ -1506,7 +1493,7 @@ class NewOrderPageState extends State<SalesReturn> {
     Widget _buildQrView(BuildContext context) {
       // For this example we check how width or tall the device is and change the scanArea and overlay accordingly.
       var scanArea = (MediaQuery.of(context).size.width < 400 ||
-          MediaQuery.of(context).size.height < 400)
+              MediaQuery.of(context).size.height < 400)
           ? 200.0
           : 300.0;
       // To ensure the Scanner view is properly sizes after rotation
@@ -1524,9 +1511,7 @@ class NewOrderPageState extends State<SalesReturn> {
       );
     }
 
-
     calculteAmount("");
-
 
     showGeneralDialog(
       barrierLabel: "Barrier",
@@ -1578,7 +1563,7 @@ class NewOrderPageState extends State<SalesReturn> {
                             child: Text(
                               "Add Item",
                               style:
-                              TextStyle(color: Colors.black, fontSize: 22),
+                                  TextStyle(color: Colors.black, fontSize: 22),
                             ),
                           ),
                           SizedBox(
@@ -1616,7 +1601,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                       height: 50,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                        BorderRadius.circular(16.0),
+                                            BorderRadius.circular(16.0),
                                         color: const Color(0xffffffff),
                                         boxShadow: [
                                           BoxShadow(
@@ -1628,19 +1613,19 @@ class NewOrderPageState extends State<SalesReturn> {
                                       ),
                                       child: Padding(
                                         padding:
-                                        EdgeInsets.only(left: 12, top: 15),
+                                            EdgeInsets.only(left: 12, top: 15),
                                         child: Text(Name),
                                       )),
                                 ),
                                 GestureDetector(
-                                  onTap: (){
+                                  onTap: () {
                                     // Navigator.push(context,
                                     //     MaterialPageRoute(builder: (context) {
                                     //       return QRViewExample();
                                     //     }));
                                     // _buildQrView(context);
                                     setState(() {
-                                      scan=!scan;
+                                      scan = !scan;
                                     });
                                   },
                                   child: Padding(
@@ -1651,7 +1636,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                           height: 50,
                                           width: 50,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                             gradient: LinearGradient(
                                               begin: Alignment(0.0, -2.03),
                                               end: Alignment(0.0, 1.0),
@@ -1677,7 +1663,13 @@ class NewOrderPageState extends State<SalesReturn> {
                           SizedBox(
                             height: 20,
                           ),
-                          scan?Container(height: 180,width: MediaQuery.of(context).size.width*0.9, child: _buildQrView(context)) :Container(),
+                          scan
+                              ? Container(
+                                  height: 180,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  child: _buildQrView(context))
+                              : Container(),
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: Row(
@@ -1748,8 +1740,13 @@ class NewOrderPageState extends State<SalesReturn> {
                                         iconSize: 35,
                                         isExpanded: true,
                                         hint: Padding(
-                                          padding: EdgeInsets.only(left: 8.0,top: 5),
-                                          child: Text(unit,style: TextStyle(color: Colors.black),),
+                                          padding: EdgeInsets.only(
+                                              left: 8.0, top: 5),
+                                          child: Text(
+                                            unit,
+                                            style:
+                                                TextStyle(color: Colors.black),
+                                          ),
                                         ),
                                         onChanged: (newValue) {
                                           setState(() {
@@ -1762,7 +1759,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                             child: Padding(
                                               padding: EdgeInsets.only(
                                                   top: 10, left: 8),
-                                              child: new Text(location),
+                                              child: Text(location),
                                             ),
                                             value: location,
                                           );
@@ -1814,7 +1811,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                 ),
                                 Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.35,
+                                      MediaQuery.of(context).size.width * 0.35,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16.0),
@@ -1834,7 +1831,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         hintText: 'Rate',
                                         //filled: true,
                                         hintStyle:
-                                        TextStyle(color: Color(0xffb0b0b0)),
+                                            TextStyle(color: Color(0xffb0b0b0)),
                                         border: InputBorder.none,
                                         contentPadding: EdgeInsets.only(
                                             left: 15,
@@ -1867,7 +1864,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                     )),
                                 Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.2,
+                                      MediaQuery.of(context).size.width * 0.2,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16.0),
@@ -1888,7 +1885,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         hintText: 'Qty',
                                         //filled: true,
                                         hintStyle:
-                                        TextStyle(color: Color(0xffb0b0b0)),
+                                            TextStyle(color: Color(0xffb0b0b0)),
                                         border: InputBorder.none,
                                         contentPadding: EdgeInsets.only(
                                             left: 15,
@@ -2111,7 +2108,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         Name,
                                         unit,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         int.parse(saleQty.text),
                                         ID,
@@ -2121,15 +2118,14 @@ class NewOrderPageState extends State<SalesReturn> {
                                         rate,
                                         code,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         "0");
                                   } else {
                                     addItem(
                                         Name,
                                         unit,
-                                        lastSaleRate
-                                            .toString(),
+                                        lastSaleRate.toString(),
                                         int.parse(saleQty.text),
                                         ID,
                                         tax.toString(),
@@ -2138,7 +2134,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         rate,
                                         code,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         byPer.text);
                                   }
@@ -2146,8 +2142,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                   setState(() {
                                     unit = "";
                                     textEditingController.text = "";
-                                    as="";
-                                    Name="";
+                                    as = "";
+                                    Name = "";
                                     rate = "";
                                     saleQty.text = "";
                                     saleRate.text = "";
@@ -2302,8 +2298,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                       if (itemData[index] != null) {
                                         String z = itemData[index]['SaleUnit'];
                                         if (itemData[index]['ItemName']
-                                            .toLowerCase()
-                                            .contains(as) ||
+                                                .toLowerCase()
+                                                .contains(as) ||
                                             itemData[index]['ItemID']
                                                 .toLowerCase()
                                                 .contains(as)) {
@@ -2313,81 +2309,83 @@ class NewOrderPageState extends State<SalesReturn> {
                                               children: [
                                                 Container(
                                                   width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
+                                                          .size
+                                                          .width -
                                                       60,
                                                   child: ListTile(
                                                       trailing: Text("ID : " +
                                                           itemData[index]
-                                                          ['ItemID']),
+                                                              ['ItemID']),
                                                       onTap: () {
                                                         setState(() {
                                                           Name = itemData[index]
-                                                          ["ItemName"]
+                                                                  ["ItemName"]
                                                               .toString();
                                                           ID = itemData[index]
-                                                          ["ItemID"]
+                                                                  ["ItemID"]
                                                               .toString();
 
                                                           textEditingController
                                                               .text = itemData[
-                                                          index]
-                                                          ["ItemName"]
+                                                                      index]
+                                                                  ["ItemName"]
                                                               .toString();
                                                           itemId =
                                                               itemData[index]
-                                                              ["ItemID"]
+                                                                      ["ItemID"]
                                                                   .toString();
                                                           unit = itemData[index]
-                                                          ["SaleUnit"]
+                                                                  ["SaleUnit"]
                                                               .toString();
                                                           rate = itemData[index]
-                                                          [
-                                                          "RateAndStock"]
-                                                          [z]["Rate"];
+                                                                  [
+                                                                  "RateAndStock"]
+                                                              [z]["Rate"];
 
                                                           rate = double.parse(
-                                                              rate)
+                                                                  rate)
                                                               .toStringAsFixed(
-                                                              User.decimals)
+                                                                  User.decimals)
                                                               .toString();
 
                                                           totalStock = itemData[
-                                                          index]
-                                                          ["TotalStock"]
+                                                                      index]
+                                                                  ["TotalStock"]
                                                               .toString();
 
                                                           code = itemData[index]
-                                                          ["Code"]
+                                                                  ["Code"]
                                                               .toString();
                                                           if (itemData[index][
-                                                          "VATInclusive"]
-                                                              .toString() ==
+                                                                      "VATInclusive"]
+                                                                  .toString() ==
                                                               "Disabled") {
                                                             vat = double.parse(
                                                                 itemData[index]
-                                                                ["VAT"]
+                                                                        ["VAT"]
                                                                     .toString());
                                                           }
                                                           saleRate.text = rate;
                                                           if (saleQty.text
-                                                              .toString() ==
+                                                                  .toString() ==
                                                               "0") {
                                                             totalAmount =
                                                                 double.parse(
-                                                                    rate) *
+                                                                        rate) *
                                                                     1;
                                                             lastSaleRate =
-                                                                totalAmount.toString();
+                                                                totalAmount
+                                                                    .toString();
                                                           } else {
                                                             totalAmount = double
-                                                                .parse(
-                                                                rate) *
+                                                                    .parse(
+                                                                        rate) *
                                                                 double.parse(
                                                                     saleQty
                                                                         .text);
                                                             lastSaleRate =
-                                                                totalAmount.toString();
+                                                                totalAmount
+                                                                    .toString();
                                                           }
                                                           unitController.text =
                                                               unit;
@@ -2395,28 +2393,28 @@ class NewOrderPageState extends State<SalesReturn> {
                                                               totalStock;
 
                                                           stock = itemData[index]
-                                                          [
-                                                          "RateAndStock"]
-                                                          [
-                                                          z]["Stock"]
-                                                          [
-                                                          int.parse(User
-                                                              .vanNo)]
+                                                                          [
+                                                                          "RateAndStock"]
+                                                                      [
+                                                                      z]["Stock"]
+                                                                  [
+                                                                  int.parse(User
+                                                                      .vanNo)]
                                                               .toString();
                                                         });
 
                                                         unitlist.clear();
                                                         Map<dynamic, dynamic>
-                                                        values =
-                                                        itemData[index][
-                                                        'RateAndStock'];
+                                                            values =
+                                                            itemData[index][
+                                                                'RateAndStock'];
                                                         values.forEach(
-                                                                (key, value) {
-                                                              setState(() {
-                                                                unitlist.add(
-                                                                    key.toString());
-                                                              });
-                                                            });
+                                                            (key, value) {
+                                                          setState(() {
+                                                            unitlist.add(
+                                                                key.toString());
+                                                          });
+                                                        });
 
                                                         Navigator.pop(context);
                                                         showBookingDialog2(
@@ -2426,32 +2424,32 @@ class NewOrderPageState extends State<SalesReturn> {
                                                       },
                                                       title: Text(
                                                         itemData[index]
-                                                        ['ItemName'],
+                                                            ['ItemName'],
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           fontSize: 13,
                                                           color: Colors.white,
                                                           fontWeight:
-                                                          FontWeight.w700,
+                                                              FontWeight.w700,
                                                         ),
                                                         textAlign:
-                                                        TextAlign.left,
+                                                            TextAlign.left,
                                                       ),
                                                       subtitle: Text(
                                                         "Price : " +
                                                             itemData[index][
-                                                            'RateAndStock']
-                                                            [z]['Rate']
+                                                                        'RateAndStock']
+                                                                    [z]['Rate']
                                                                 .toString(),
                                                         style: TextStyle(
                                                           fontFamily: 'Arial',
                                                           fontSize: 10,
                                                           color: Colors.white,
                                                           fontWeight:
-                                                          FontWeight.w700,
+                                                              FontWeight.w700,
                                                         ),
                                                         textAlign:
-                                                        TextAlign.left,
+                                                            TextAlign.left,
                                                       ),
                                                       leading: Container(
                                                         height: 50,
@@ -2460,14 +2458,14 @@ class NewOrderPageState extends State<SalesReturn> {
                                                         child: Center(
                                                           child: Text(
                                                             itemData[index]
-                                                            ['ItemName']
+                                                                    ['ItemName']
                                                                 .toString()
                                                                 .substring(0, 1)
                                                                 .toUpperCase(),
                                                             style: TextStyle(
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                                 fontSize: 20),
                                                           ),
                                                         ),
@@ -2496,7 +2494,7 @@ class NewOrderPageState extends State<SalesReturn> {
         transitionBuilder: (_, anim, __, child) {
           return SlideTransition(
             position:
-            Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+                Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
             child: child,
           );
         },
@@ -2504,10 +2502,10 @@ class NewOrderPageState extends State<SalesReturn> {
     }
 
     setState(() {
-      ns.text=tempName;
-      Name=tempName;
-      saleRate.text=rateList[indexToDelete];
-      rate=rateList[indexToDelete];
+      ns.text = tempName;
+      Name = tempName;
+      saleRate.text = rateList[indexToDelete];
+      rate = rateList[indexToDelete];
       textEditingController.text = tempName;
       saleQty.text = "1";
     });
@@ -2521,42 +2519,40 @@ class NewOrderPageState extends State<SalesReturn> {
         setState(() {
           totalAmount = double.parse(saleQty.text) * double.parse(rate);
           double t = totalAmount * (vat / 100);
-          tax = double.parse(t.toStringAsFixed(User.decimals));
+          tax = double.parse(t.toStringAsFixed(2));
           totalAmount = totalAmount + tax;
-          lastSaleRate =
-              totalAmount.toStringAsFixed(User.decimals);
+          lastSaleRate = totalAmount.toStringAsFixed(2);
         });
       } else {
         setState(() {
           totalAmount = double.parse(saleQty.text) * double.parse(rate);
-          lastSaleRate =totalAmount.toStringAsFixed(User.decimals);
+          lastSaleRate = totalAmount.toStringAsFixed(2);
         });
       }
     }
 
     void disPri(String a) {
       setState(() {
-        lastSaleRate = totalAmount.toStringAsFixed(User.decimals);
+        lastSaleRate = totalAmount.toStringAsFixed(2);
       });
       setState(() {
-        var a=  totalAmount - double.parse(byPri.text);
-        lastSaleRate =
-            a.toStringAsFixed(User.decimals);
-        double b= (totalAmount - double.parse(lastSaleRate)) / (totalAmount) * 100;
-        byPer.text = b.toStringAsFixed(User.decimals);
+        var a = totalAmount - double.parse(byPri.text);
+        lastSaleRate = a.toStringAsFixed(2);
+        double b =
+            (totalAmount - double.parse(lastSaleRate)) / (totalAmount) * 100;
+        byPer.text = b.toStringAsFixed(2);
       });
     }
 
     void disPer(String a) {
       setState(() {
-        lastSaleRate = totalAmount.toStringAsFixed(User.decimals);
+        lastSaleRate = totalAmount.toStringAsFixed(2);
       });
       setState(() {
-        var a =
-            totalAmount - totalAmount / 100 * double.parse(byPer.text);
-        lastSaleRate = a.toStringAsFixed(User.decimals);
+        var a = totalAmount - totalAmount / 100 * double.parse(byPer.text);
+        lastSaleRate = a.toStringAsFixed(2);
         double val = totalAmount - double.parse(lastSaleRate);
-        byPri.text = val.toStringAsFixed(User.decimals);
+        byPri.text = val.toStringAsFixed(2);
       });
     }
 
@@ -2610,7 +2606,7 @@ class NewOrderPageState extends State<SalesReturn> {
                             child: Text(
                               "Add Item",
                               style:
-                              TextStyle(color: Colors.black, fontSize: 22),
+                                  TextStyle(color: Colors.black, fontSize: 22),
                             ),
                           ),
                           SizedBox(
@@ -2647,7 +2643,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                       height: 50,
                                       decoration: BoxDecoration(
                                         borderRadius:
-                                        BorderRadius.circular(16.0),
+                                            BorderRadius.circular(16.0),
                                         color: const Color(0xffffffff),
                                         boxShadow: [
                                           BoxShadow(
@@ -2659,7 +2655,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                       ),
                                       child: Padding(
                                         padding:
-                                        EdgeInsets.only(left: 12, top: 15),
+                                            EdgeInsets.only(left: 12, top: 15),
                                         child: Text(Name),
                                       )),
                                 ),
@@ -2718,7 +2714,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                 ),
                                 Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.35,
+                                      MediaQuery.of(context).size.width * 0.35,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16.0),
@@ -2747,8 +2743,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                       return DropdownMenuItem(
                                         child: Padding(
                                           padding:
-                                          EdgeInsets.only(top: 10, left: 8),
-                                          child: new Text(location),
+                                              EdgeInsets.only(top: 10, left: 8),
+                                          child: Text(location),
                                         ),
                                         value: location,
                                       );
@@ -2798,7 +2794,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                 ),
                                 Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.35,
+                                      MediaQuery.of(context).size.width * 0.35,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16.0),
@@ -2818,7 +2814,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         hintText: 'Rate',
                                         //filled: true,
                                         hintStyle:
-                                        TextStyle(color: Color(0xffb0b0b0)),
+                                            TextStyle(color: Color(0xffb0b0b0)),
                                         border: InputBorder.none,
                                         contentPadding: EdgeInsets.only(
                                             left: 15,
@@ -2851,7 +2847,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                     )),
                                 Container(
                                   width:
-                                  MediaQuery.of(context).size.width * 0.2,
+                                      MediaQuery.of(context).size.width * 0.2,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16.0),
@@ -2872,7 +2868,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         hintText: 'Qty',
                                         //filled: true,
                                         hintStyle:
-                                        TextStyle(color: Color(0xffb0b0b0)),
+                                            TextStyle(color: Color(0xffb0b0b0)),
                                         border: InputBorder.none,
                                         contentPadding: EdgeInsets.only(
                                             left: 15,
@@ -3090,7 +3086,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         textEditingController.text,
                                         unit,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         int.parse(saleQty.text),
                                         itemId,
@@ -3100,15 +3096,14 @@ class NewOrderPageState extends State<SalesReturn> {
                                         rate,
                                         code,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         "0");
                                   } else {
                                     addItem(
                                         textEditingController.text,
                                         unit,
-                                        lastSaleRate
-                                            .toString(),
+                                        lastSaleRate.toString(),
                                         int.parse(saleQty.text),
                                         itemId,
                                         tax.toString(),
@@ -3117,7 +3112,7 @@ class NewOrderPageState extends State<SalesReturn> {
                                         rate,
                                         code,
                                         totalAmount
-                                            .toStringAsFixed(User.decimals)
+                                            .toStringAsFixed(2)
                                             .toString(),
                                         byPer.text);
                                   }
@@ -3130,8 +3125,8 @@ class NewOrderPageState extends State<SalesReturn> {
                                     unit = "";
                                     textEditingController.text = "";
                                     rate = "";
-                                    as="";
-                                    Name="";
+                                    as = "";
+                                    Name = "";
                                     saleQty.text = "";
                                     saleRate.text = "";
                                     unitController.text = "";
@@ -3268,8 +3263,6 @@ class NewOrderPageState extends State<SalesReturn> {
     );
   }
 
-
-
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     log('${DateTime.now().toIso8601String()}_onPermissionSet $p');
     if (!p) {
@@ -3284,5 +3277,4 @@ class NewOrderPageState extends State<SalesReturn> {
     controller?.dispose();
     super.dispose();
   }
-
 }

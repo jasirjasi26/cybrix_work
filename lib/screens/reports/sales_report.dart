@@ -1,4 +1,6 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+
 import 'package:cybrix/data/user_data.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../van_page.dart';
-class SalesReport1 extends StatefulWidget {
 
+class SalesReport1 extends StatefulWidget {
   @override
   SalesReport1State createState() => SalesReport1State();
 }
@@ -37,14 +39,13 @@ class SalesReport1State extends State<SalesReport1> {
       "-" +
       DateTime.now().day.toString();
 
-
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         from = selectedDate.year.toString() +
@@ -53,6 +54,7 @@ class SalesReport1State extends State<SalesReport1> {
             "-" +
             selectedDate.day.toString();
       });
+    }
 
     getCustomerId(from);
   }
@@ -63,7 +65,7 @@ class SalesReport1State extends State<SalesReport1> {
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         to = selectedDate.year.toString() +
@@ -72,11 +74,14 @@ class SalesReport1State extends State<SalesReport1> {
             "-" +
             selectedDate.day.toString();
       });
+    }
 
     getCustomerId(from);
   }
 
   Future<void> getCustomerId(String customer) async {
+
+    print("dffd");
     setState(() {
       dates.clear();
       code.clear();
@@ -87,61 +92,59 @@ class SalesReport1State extends State<SalesReport1> {
       tax.clear();
     });
 
-      await reference.child("Bills").once().then((DataSnapshot snapshot) {
-        Map<dynamic, dynamic> values = snapshot.value;
-        values.forEach((key, values) async {
-          DateFormat inputFormat = DateFormat('yyyy-mm-dd');
-          DateTime input = inputFormat.parse(from);
-          DateTime inputTo = inputFormat.parse(to);
-          DateTime inputKey = inputFormat.parse(key);
+    await reference.child("Bills").once().then((DataSnapshot snapshot) {
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key, values) async {
+        DateFormat inputFormat = DateFormat('yyyy-mm-dd');
+        DateTime input = inputFormat.parse(from);
+        DateTime inputTo = inputFormat.parse(to);
+        DateTime inputKey = inputFormat.parse(key);
 
-          String datefrom = DateFormat('yyyy-mm-dd').format(input);
-          String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
-          String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
+        String datefrom = DateFormat('yyyy-mm-dd').format(input);
+        String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
+        String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
 
-          if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
-              DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
-            await reference
-                .child("Bills")
-                .child(key)
-                .child(User.vanNo)
-                .once()
-                .then((DataSnapshot snapshot) {
-              Map<dynamic, dynamic> values = snapshot.value;
-              values.forEach((key, values) {
-                if (values['CustomerName']
-                    .toString()
-                    .toLowerCase()
-                    .contains(name.text.toLowerCase())) {
-                  setState(() {
-                    names.add(values['CustomerName'].toString());
-                    amount.add(values['Amount'].toString());
-                    dates.add(values['VoucherDate'].toString());
-                    vNo.add(values['OrderID'].toString());
-                    code.add(values['CustomerID'].toString());
-                    balance.add(values['Balance'].toString());
-                    tax.add(values['TaxAmount'].toString());
-                  });
-                }
-              });
+        if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
+                DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
+            DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
+            DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
+          await reference
+              .child("Bills")
+              .child(key)
+              .child(User.vanNo)
+              .once()
+              .then((DataSnapshot snapshot) {
+            Map<dynamic, dynamic> values = snapshot.value;
+            values.forEach((key, values) {
+              if (values['CustomerName']
+                  .toString()
+                  .toLowerCase()
+                  .contains(name.text.toLowerCase())) {
+                setState(() {
+                  names.add(values['CustomerName'].toString());
+                  amount.add(values['Amount'].toString());
+                  dates.add(values['VoucherDate'].toString());
+                  vNo.add(values['OrderID'].toString());
+                  code.add(values['CustomerID'].toString());
+                  balance.add(values['Balance'].toString());
+                  tax.add(values['TaxAmount'].toString());
+                });
+              }
             });
-          } else {
-            print("Noo data");
-          }
-        });
+          });
+        } else {
+          print("Noo data");
+        }
       });
-
+    });
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
     reference = FirebaseDatabase.instance
         .reference()
         .child("Companies")
         .child(User.database);
-    print(User.database);
     getCustomerId(from);
 
     super.initState();
@@ -183,6 +186,7 @@ class SalesReport1State extends State<SalesReport1> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.0),
                     color: const Color(0xffffffff),
+                    // ignore: prefer_const_literals_to_create_immutables
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0x29000000),
@@ -210,7 +214,6 @@ class SalesReport1State extends State<SalesReport1> {
                       )),
                 ),
               ),
-
             ],
           ),
           Padding(
@@ -288,7 +291,7 @@ class SalesReport1State extends State<SalesReport1> {
           child: Column(
             children: [
               Container(
-                  height: 25,
+                  height: 45,
                   width: 600,
                   decoration: BoxDecoration(
                     color: const Color(0xff454d60),
@@ -403,9 +406,9 @@ class SalesReport1State extends State<SalesReport1> {
                 width: 600,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
-                  children: new List.generate(
+                  children: List.generate(
                     names.length,
-                        (index) => Container(
+                    (index) => Container(
                       height: 30,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
@@ -491,13 +494,13 @@ class SalesReport1State extends State<SalesReport1> {
                               onTap: () {
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
-                                      return VanPage(
-                                          customerName: names[index],
-                                          voucherNumber: vNo[index],
-                                          date: dates[index],
-                                          billAmount: amount[index],
-                                          back: true);
-                                    }));
+                                  return VanPage(
+                                      customerName: names[index],
+                                      voucherNumber: vNo[index],
+                                      date: dates[index],
+                                      billAmount: amount[index],
+                                      back: true);
+                                }));
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(3.0),

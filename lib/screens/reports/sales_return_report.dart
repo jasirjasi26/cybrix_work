@@ -1,11 +1,12 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace
+
 import 'package:cybrix/data/user_data.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'dart:ui';
-
 
 class ReturnsPage1 extends StatefulWidget {
   @override
@@ -50,7 +51,6 @@ class ReturnsPageState extends State<ReturnsPage1> {
       });
     });
   }
-
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -113,7 +113,7 @@ class ReturnsPageState extends State<ReturnsPage1> {
         String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
 
         if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
-            DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
+                DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
             DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
             DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
           print(key);
@@ -210,6 +210,7 @@ class ReturnsPageState extends State<ReturnsPage1> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.0),
                     color: const Color(0xffffffff),
+                    // ignore: prefer_const_literals_to_create_immutables
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0x29000000),
@@ -314,7 +315,7 @@ class ReturnsPageState extends State<ReturnsPage1> {
           child: Column(
             children: [
               Container(
-                  height: 25,
+                  height: 45,
                   width: 500,
                   decoration: BoxDecoration(
                     color: const Color(0xff454d60),
@@ -403,9 +404,9 @@ class ReturnsPageState extends State<ReturnsPage1> {
                 width: 500,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
-                  children: new List.generate(
+                  children: List.generate(
                     names.length,
-                        (index) => Container(
+                    (index) => Container(
                       height: 30,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(

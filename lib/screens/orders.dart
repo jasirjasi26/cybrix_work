@@ -1,5 +1,12 @@
 // @dart=2.9
+// ignore_for_file: prefer_const_constructors, sized_box_for_whitespace, avoid_unnecessary_containers, avoid_print
+
+import 'dart:convert';
+
+import 'package:api_cache_manager/utils/cache_manager.dart';
 import 'package:cybrix/data/user_data.dart';
+import 'package:cybrix/handler/syncronize.dart';
+import 'package:cybrix/models/order_model.dart';
 import 'package:cybrix/screens/setleAfterOrder.dart';
 import 'package:cybrix/screens/van_page.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -8,6 +15,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class OrdersPage extends StatefulWidget {
+  const OrdersPage({Key key}) : super(key: key);
+
   @override
   OrdersPageState createState() => OrdersPageState();
 }
@@ -23,6 +32,7 @@ class OrdersPageState extends State<OrdersPage> {
   List<String> balance = [];
   List<String> tax = [];
   var name = TextEditingController();
+  List orders=[];
 
   DateTime selectedDate = DateTime.now();
   String from = DateTime.now().year.toString() +
@@ -43,15 +53,18 @@ class OrdersPageState extends State<OrdersPage> {
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      setState(() {
-        selectedDate = picked;
-        from = selectedDate.year.toString() +
-            "-" +
-            selectedDate.month.toString() +
-            "-" +
-            selectedDate.day.toString();
-      });
+    if (picked != null && picked != selectedDate) {
+      setState(
+        () {
+          selectedDate = picked;
+          from = selectedDate.year.toString() +
+              "-" +
+              selectedDate.month.toString() +
+              "-" +
+              selectedDate.day.toString();
+        },
+      );
+    }
 
     getCustomerId(from);
   }
@@ -62,7 +75,7 @@ class OrdersPageState extends State<OrdersPage> {
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
+    if (picked != null && picked != selectedDate) {
       setState(() {
         selectedDate = picked;
         to = selectedDate.year.toString() +
@@ -71,6 +84,7 @@ class OrdersPageState extends State<OrdersPage> {
             "-" +
             selectedDate.day.toString();
       });
+    }
 
     getCustomerId(from);
   }
@@ -84,99 +98,116 @@ class OrdersPageState extends State<OrdersPage> {
       names.clear();
       balance.clear();
       tax.clear();
+      orders.clear();
     });
 
     if (select) {
-      DateFormat inputFormat = DateFormat('yyyy-mm-dd');
-      DateTime input = inputFormat.parse(from);
-      DateTime inputTo = inputFormat.parse(to);
+      await reference.child("Order").once().then(
+            (DataSnapshot snapshot) {
+          Map<dynamic, dynamic> values = snapshot.value;
+          values.forEach(
+                (key, values) async {
+              DateFormat inputFormat = DateFormat('yyyy-mm-dd');
+              DateTime input = inputFormat.parse(from);
+              DateTime inputTo = inputFormat.parse(to);
+              DateTime inputKey = inputFormat.parse(key);
+              String datefrom = DateFormat('yyyy-mm-dd').format(input);
+              String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
+              String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
 
-      String datefrom = DateFormat('yyyy-mm-dd').format(input);
-      String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
-
-      await reference
-          .child("Order")
-          // .child(key)
-          .child(User.vanNo)
-          .once()
-          .then((DataSnapshot snapshot) {
-        Map<dynamic, dynamic> values = snapshot.value;
-
-        values.forEach((key, values) {
-          DateTime inputKey = inputFormat.parse(values['VoucherDate']);
-          String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
-
-          if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
-                  DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
-            if (values['CustomerName']
-                .toString()
-                .toLowerCase()
-                .contains(name.text.toLowerCase())) {
-              setState(() {
-                names.add(values['CustomerName'].toString());
-                amount.add(values['Amount'].toString());
-                dates.add(values['VoucherDate'].toString());
-                vNo.add(values['OrderID'].toString());
-                code.add(values['CustomerID'].toString());
-                balance.add(values['Balance'].toString());
-                tax.add(values['TaxAmount'].toString());
-              });
-            }
-          }
-        });
-      });
-    } else {
-      await reference.child("Bills").once().then((DataSnapshot snapshot) {
-        Map<dynamic, dynamic> values = snapshot.value;
-        values.forEach((key, values) async {
-          DateFormat inputFormat = DateFormat('yyyy-mm-dd');
-          DateTime input = inputFormat.parse(from);
-          DateTime inputTo = inputFormat.parse(to);
-          DateTime inputKey = inputFormat.parse(key);
-          String datefrom = DateFormat('yyyy-mm-dd').format(input);
-          String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
-          String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
-
-          if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
-                  DateTime.parse(dateKeys).isBefore(DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
-              DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
-            await reference
-                .child("Bills")
-                .child(key)
-                .child(User.vanNo)
-                .once()
-                .then((DataSnapshot snapshot) {
-              Map<dynamic, dynamic> values = snapshot.value;
-              values.forEach((key, values) {
-                if (values['CustomerName']
-                    .toString()
-                    .toLowerCase()
-                    .contains(name.text.toLowerCase())) {
-                  setState(() {
-                    names.add(values['CustomerName'].toString());
-                    amount.add(values['Amount'].toString());
-                    dates.add(values['VoucherDate'].toString());
-                    vNo.add(values['OrderID'].toString());
-                    code.add(values['CustomerID'].toString());
-                    balance.add(values['Balance'].toString());
-                    tax.add(values['TaxAmount'].toString());
+              if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
+                  DateTime.parse(dateKeys)
+                      .isBefore(DateTime.parse(dateTo)) ||
+                  DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
+                  DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
+                await reference
+                    .child("Order")
+                    .child(key)
+                    .child(User.vanNo)
+                    .once()
+                    .then((DataSnapshot snapshot) {
+                  Map<dynamic, dynamic> values = snapshot.value;
+                  values.forEach((key, values) {
+                    if (values['CustomerName']
+                        .toString()
+                        .toLowerCase()
+                        .contains(name.text.toLowerCase())) {
+                      setState(() {
+                        names.add(values['CustomerName'].toString());
+                        amount.add(values['Amount'].toString());
+                        dates.add(values['VoucherDate'].toString());
+                        vNo.add(values['OrderID'].toString());
+                        code.add(values['CustomerID'].toString());
+                        balance.add(values['Balance'].toString());
+                        tax.add(values['TaxAmount'].toString());
+                        orders.add(values);
+                      });
+                    }
                   });
-                }
-              });
-            });
-          } else {
-            print("Noo data");
-          }
-        });
-      });
+                });
+              } else {
+                print("Noo data");
+              }
+            },
+          );
+        },
+      );
+    } else {
+      await reference.child("Bills").once().then(
+        (DataSnapshot snapshot) {
+          Map<dynamic, dynamic> values = snapshot.value;
+          values.forEach(
+            (key, values) async {
+              DateFormat inputFormat = DateFormat('yyyy-mm-dd');
+              DateTime input = inputFormat.parse(from);
+              DateTime inputTo = inputFormat.parse(to);
+              DateTime inputKey = inputFormat.parse(key);
+              String datefrom = DateFormat('yyyy-mm-dd').format(input);
+              String dateTo = DateFormat('yyyy-mm-dd').format(inputTo);
+              String dateKeys = DateFormat('yyyy-mm-dd').format(inputKey);
+
+              if (DateTime.parse(dateKeys).isAfter(DateTime.parse(datefrom)) &&
+                      DateTime.parse(dateKeys)
+                          .isBefore(DateTime.parse(dateTo)) ||
+                  DateTime.parse(dateKeys) == (DateTime.parse(dateTo)) ||
+                  DateTime.parse(dateKeys) == (DateTime.parse(datefrom))) {
+                await reference
+                    .child("Bills")
+                    .child(key)
+                    .child(User.vanNo)
+                    .once()
+                    .then((DataSnapshot snapshot) {
+                  Map<dynamic, dynamic> values = snapshot.value;
+                  values.forEach((key, values) {
+                    if (values['CustomerName']
+                        .toString()
+                        .toLowerCase()
+                        .contains(name.text.toLowerCase())) {
+                      setState(() {
+                        names.add(values['CustomerName'].toString());
+                        amount.add(values['Amount'].toString());
+                        dates.add(values['VoucherDate'].toString());
+                        vNo.add(values['OrderID'].toString());
+                        code.add(values['CustomerID'].toString());
+                        balance.add(values['Balance'].toString());
+                        tax.add(values['TaxAmount'].toString());
+                        orders.add(values);
+                      });
+                    }
+                  });
+                });
+              } else {
+                print("Noo data");
+              }
+            },
+          );
+        },
+      );
     }
   }
 
+  @override
   void initState() {
-    // TODO: implement initState
     reference = FirebaseDatabase.instance
         .reference()
         .child("Companies")
@@ -195,65 +226,46 @@ class OrdersPageState extends State<OrdersPage> {
         children: [
           Center(
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.5,
+              width: MediaQuery.of(context).size.width,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              select = true;
-                            });
-                            getCustomerId(from);
-                          },
-                          child: Text(
-                            'Sales Order',
-                            style: TextStyle(
-                              fontFamily: 'Arial',
-                              fontSize: 16,
-                              color: select ? Colors.black : Color(0xffb0b0b0),
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        Divider(
-                          color: Colors.blue,
-                          height: 10,
-                          thickness: 2,
-                        )
-                      ],
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        select = true;
+                      });
+                      getCustomerId(from);
+                    },
+                    child: Text(
+                      'Sales Order',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 16,
+                        color: select ? Colors.black : Color(0xffb0b0b0),
+                      ),
+                      textAlign: TextAlign.left,
                     ),
                   ),
                   SizedBox(
-                    width: 50,
+                    width: 40,
                   ),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            select = false;
-                          });
-                          getCustomerId(from);
-                        },
-                        child: Text(
-                          'Sales Invoice',
-                          style: TextStyle(
-                            fontFamily: 'Arial',
-                            fontSize: 16,
-                            color: select ? Color(0xffb0b0b0) : Colors.black,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        select = false;
+                      });
+                      getCustomerId(from);
+                    },
+                    child: Text(
+                      'Sales Invoice',
+                      style: TextStyle(
+                        fontFamily: 'Arial',
+                        fontSize: 16,
+                        color: select ? Color(0xffb0b0b0) : Colors.black,
                       ),
-                      Divider(
-                        color: Colors.blue,
-                        height: 10,
-                        thickness: 2,
-                      )
-                    ],
+                      textAlign: TextAlign.left,
+                    ),
                   ),
                 ],
               ),
@@ -288,6 +300,7 @@ class OrdersPageState extends State<OrdersPage> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16.0),
                     color: const Color(0xffffffff),
+                    // ignore: prefer_const_literals_to_create_immutables
                     boxShadow: [
                       BoxShadow(
                         color: const Color(0x29000000),
@@ -403,7 +416,7 @@ class OrdersPageState extends State<OrdersPage> {
           child: Column(
             children: [
               Container(
-                  height: 25,
+                  height: 45,
                   width: 600,
                   decoration: BoxDecoration(
                     color: const Color(0xff454d60),
@@ -522,10 +535,10 @@ class OrdersPageState extends State<OrdersPage> {
                 width: 600,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
-                  children: new List.generate(
+                  children: List.generate(
                     names.length,
                     (index) => Container(
-                      height: 30,
+                      height: 40,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: index.floor().isEven
@@ -617,7 +630,7 @@ class OrdersPageState extends State<OrdersPage> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: GestureDetector(
-                              onTap: () {
+                              onTap: () async {
                                 Map<String, dynamic> values = {
                                   'Amount': amount[index],
                                   'Balance': balance[index],
@@ -625,12 +638,14 @@ class OrdersPageState extends State<OrdersPage> {
                                   'TaxAmount': tax[index],
                                   'CustomerID': code[index]
                                 };
+                                var pdfText = await json
+                                    .decode(json.encode(orders[index]));
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
                                   return Settlement2(
                                     customerName: names[index],
                                     date: dates[index],
-                                    values: values,
+                                    values: pdfText,
                                     radioValue: 0,
                                   );
                                 }));
@@ -652,7 +667,7 @@ class OrdersPageState extends State<OrdersPage> {
                               onTap: () {
                                 reference
                                     .child("Order")
-                                    //.child(dates[index])
+                                    .child(dates[index])
                                     .child(User.vanNo)
                                     .child(vNo[index])
                                     .once()
@@ -660,14 +675,14 @@ class OrdersPageState extends State<OrdersPage> {
                                   var data = snapshot.value;
                                   reference
                                       .child("DeletedOrder")
-                                      //.child(dates[index])
+                                      .child(dates[index])
                                       .child(User.vanNo)
                                       .child(vNo[index])
                                       .set(data)
                                       .whenComplete(() => {
                                             reference
                                               ..child("Order")
-                                                  //.child(dates[index])
+                                                  .child(dates[index])
                                                   .child(User.vanNo)
                                                   .child(vNo[index])
                                                   .remove(),
@@ -707,7 +722,7 @@ class OrdersPageState extends State<OrdersPage> {
           child: Column(
             children: [
               Container(
-                  height: 25,
+                  height: 45,
                   width: 600,
                   decoration: BoxDecoration(
                     color: const Color(0xff454d60),
@@ -802,18 +817,6 @@ class OrdersPageState extends State<OrdersPage> {
                               textAlign: TextAlign.left,
                             ),
                           ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child: Text(
-                          //     ' Action   ',
-                          //     style: TextStyle(
-                          //       fontFamily: 'Arial',
-                          //       fontSize: 12,
-                          //       color: const Color(0xffffffff),
-                          //     ),
-                          //     textAlign: TextAlign.left,
-                          //   ),
-                          // )
                         ],
                       ),
                     ),
@@ -822,10 +825,10 @@ class OrdersPageState extends State<OrdersPage> {
                 width: 600,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
-                  children: new List.generate(
+                  children: List.generate(
                     names.length,
                     (index) => Container(
-                      height: 30,
+                      height: 40,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: index.floor().isEven
@@ -907,7 +910,9 @@ class OrdersPageState extends State<OrdersPage> {
                           Padding(
                             padding: const EdgeInsets.all(5.0),
                             child: GestureDetector(
-                              onTap: () {
+                              onTap: () async {
+                                var pdfText = await json
+                                    .decode(json.encode(orders[index]));
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
                                   return VanPage(
@@ -915,6 +920,7 @@ class OrdersPageState extends State<OrdersPage> {
                                       voucherNumber: vNo[index],
                                       date: dates[index],
                                       billAmount: amount[index],
+                                      values: pdfText,
                                       back: true);
                                 }));
                               },

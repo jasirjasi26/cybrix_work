@@ -1,4 +1,8 @@
 // @dart=2.9
+// ignore_for_file: file_names, avoid_single_cascade_in_expression_statements, prefer_const_constructors
+
+import 'dart:convert';
+
 import 'package:cybrix/data/getVouchers.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,8 +70,9 @@ class SettlementPageState2 extends State<Settlement2> {
   addValues() async {
     reference
       ..child("Order")
+          .child(widget.date)
           .child(User.vanNo)
-          .child(widget.values['OrderId'])
+          .child("CR12O10")
           .once()
           .then((DataSnapshot snapshot) {
         var data = snapshot.value;
@@ -79,16 +84,16 @@ class SettlementPageState2 extends State<Settlement2> {
               .child(voucherNo.text)
               .set(data);
 
-        double ch=double.parse(paidCash.text);
-        double cr=double.parse(paidCard.text);
+        double ch = double.parse(paidCash.text);
+        double cr = double.parse(paidCard.text);
 
         Map<String, String> values = {
-          'Balance': finalBalance.toStringAsFixed(User.decimals),
+          'Balance': finalBalance.toStringAsFixed(2),
           'Amount': subTotal.text,
-          'CardReceived': cr.toStringAsFixed(User.decimals),
-          'CashReceived': cr.toStringAsFixed(User.decimals),
+          'CardReceived': cr.toStringAsFixed(2),
+          'CashReceived': ch.toStringAsFixed(2),
           'OrderID': voucherNo.text,
-          'RoundOff': rounoff.toStringAsFixed(User.decimals),
+          'RoundOff': rounoff.toStringAsFixed(2),
           'TotalReceived': totalReceived.toString(),
           'UpdatedTime': DateTime.now().toString(),
           'VoucherDate': widget.date,
@@ -101,7 +106,6 @@ class SettlementPageState2 extends State<Settlement2> {
             .child(voucherNo.text)
             .update(values);
       });
-
 
     ///updating the voucher number
     String lastVoucher = voucherNo.text.replaceAll(User.voucherStarting, "");
@@ -119,7 +123,7 @@ class SettlementPageState2 extends State<Settlement2> {
               });
 
     final prefs = await SharedPreferences.getInstance();
-    prefs.setInt("vouchernumber",int.parse(lastVoucher));
+    prefs.setInt("vouchernumber", int.parse(lastVoucher));
 
     FlutterFlexibleToast.showToast(
         message: "Added to Invoice",
@@ -132,16 +136,30 @@ class SettlementPageState2 extends State<Settlement2> {
         backgroundColor: Colors.black,
         timeInSeconds: 2);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return VanPage(
-        customerName: widget.customerName,
-        voucherNumber: voucherNo.text,
-        date: widget.date,
-        billAmount: widget.values['BillAmount'],
-        from: "Bills",
-        back: false,
-      );
-    }));
+    await reference
+        .child("Bills")
+        .child(widget.date)
+        .child(User.vanNo)
+        .child(voucherNo.text)
+        .once()
+        .then((DataSnapshot snapshot) async {
+      Map<dynamic, dynamic> values = snapshot.value;
+      var pdfText = await json
+          .decode(json.encode(values));
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return VanPage(
+            customerName: widget.customerName,
+            voucherNumber: voucherNo.text,
+            date: widget.date,
+            values: pdfText,
+            billAmount: widget.values['BillAmount'],
+            back: false,
+          );
+        }));
+
+
+    });
+
   }
 
   getOldBalance() async {
@@ -151,7 +169,7 @@ class SettlementPageState2 extends State<Settlement2> {
         if (widget.customerName == values["Name"]) {
           setState(() {
             double a = double.parse(values["Balance"]);
-            Customer.balance = a.toStringAsFixed(User.decimals);
+            Customer.balance = a.toStringAsFixed(2);
             Customer.CustomerName = values["Name"].toString();
             oldBalance.text = Customer.balance;
           });
@@ -176,7 +194,7 @@ class SettlementPageState2 extends State<Settlement2> {
     // });
 
     setState(() {
-      voucherNo.text=User.voucherNumber;
+      voucherNo.text = User.voucherNumber;
       billAmount.text = widget.values['Amount'].toString();
       subTotal.text = widget.values['Amount'].toString();
       paidCash.text = "0";
@@ -695,7 +713,7 @@ class SettlementPageState2 extends State<Settlement2> {
                         ),
                       ],
                     ),
-                    child: Center(child: Text(finalBalance.toStringAsFixed(User.decimals))),
+                    child: Center(child: Text(finalBalance.toStringAsFixed(2))),
                   ),
                 ],
               ),
